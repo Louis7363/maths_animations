@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fonctions Usuelles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #canvas-container { position: relative; width: 100vw; height: 100vh; cursor: grab; }
+        #canvas-container:active { cursor: grabbing; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 350px;
+            pointer-events: auto;
+            border: 1px solid #e2e8f0;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        .math-text { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+        
+        /* Custom scrollbar pour le panel */
+        #ui-panel::-webkit-scrollbar { width: 6px; }
+        #ui-panel::-webkit-scrollbar-track { background: transparent; }
+        #ui-panel::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container">
+    <canvas id="graphCanvas"></canvas>
+    
+    <div id="ui-panel">
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-xl font-bold text-slate-800">Fonctions Usuelles</h1>
+            <a href="index.html" class="text-sm text-blue-600 hover:underline">Retour</a>
+        </div>
+        
+        <p class="text-sm text-slate-600 mb-4 pb-4 border-b border-slate-200">
+            Cochez les fonctions à afficher. Manipulez les paramètres ou glissez la souris pour explorer.
+        </p>
+
+        <!-- Contrôles de Manipulation -->
+        <div class="mb-6 bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <div class="text-center mb-2 text-slate-700">
+                Formule : <span class="math-text text-lg text-rose-600">y = <span id="val-A">1</span> &times; f(<span id="val-k">1</span> &times; x)</span>
+            </div>
+            
+            <div class="mb-3">
+                <label class="flex justify-between text-sm text-slate-600 mb-1">
+                    <span>Amplitude (A)</span>
+                </label>
+                <input type="range" id="slider-A" min="-3" max="3" step="0.1" value="1" class="w-full accent-rose-500">
+            </div>
+            
+            <div>
+                <label class="flex justify-between text-sm text-slate-600 mb-1">
+                    <span>Multiplicateur X (k)</span>
+                </label>
+                <input type="range" id="slider-k" min="-3" max="3" step="0.1" value="1" class="w-full accent-blue-500">
+            </div>
+            
+            <button id="btn-reset" class="mt-3 w-full py-1 px-2 bg-white border border-slate-300 rounded text-sm hover:bg-slate-100 transition">
+                Réinitialiser la vue
+            </button>
+        </div>
+
+        <!-- Liste des Fonctions -->
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">Trigonométrie</h2>
+        <div class="grid grid-cols-2 gap-2 mb-4" id="trigo-container"></div>
+        
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">Trigo Inverse</h2>
+        <div class="grid grid-cols-2 gap-2 mb-4" id="inv-container"></div>
+
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">Hyperbolique</h2>
+        <div class="grid grid-cols-2 gap-2 mb-2" id="hyp-container"></div>
+        
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Dictionnaire des fonctions mathématiques
+    const functionsList = [
+        { id: 'sin', name: 'sin(x)', category: 'trigo', color: '#EF4444', fn: Math.sin },
+        { id: 'cos', name: 'cos(x)', category: 'trigo', color: '#3B82F6', fn: Math.cos },
+        { id: 'tan', name: 'tan(x)', category: 'trigo', color: '#10B981', fn: Math.tan },
+        
+        { id: 'asin', name: 'arcsin(x)', category: 'inv', color: '#EC4899', fn: Math.asin },
+        { id: 'acos', name: 'arccos(x)', category: 'inv', color: '#06B6D4', fn: Math.acos },
+        { id: 'atan', name: 'arctan(x)', category: 'inv', color: '#F59E0B', fn: Math.atan },
+        
+        { id: 'sh', name: 'sh(x)', category: 'hyp', color: '#8B5CF6', fn: Math.sinh },
+        { id: 'ch', name: 'ch(x)', category: 'hyp', color: '#14B8A6', fn: Math.cosh },
+        { id: 'th', name: 'th(x)', category: 'hyp', color: '#A855F7', fn: Math.tanh }
+    ];
+
+    // État actif des fonctions (seul le sinus est coché au départ)
+    const activeFuncs = new Set(['sin']);
+
+    // Paramètres de vue et de manipulation
+    let scale = 60; // pixels par unité
+    let offsetX = 0;
+    let offsetY = 0;
+    let paramA = 1.0;
+    let paramK = 1.0;
+
+    // Initialisation de l'UI
+    function initUI() {
+        const containers = {
+            'trigo': document.getElementById('trigo-container'),
+            'inv': document.getElementById('inv-container'),
+            'hyp': document.getElementById('hyp-container')
+        };
+
+        functionsList.forEach(func => {
+            const label = document.createElement('label');
+            label.className = `flex items-center space-x-2 p-2 rounded border cursor-pointer hover:bg-slate-50 transition-colors`;
+            label.style.borderColor = activeFuncs.has(func.id) ? func.color : '#e2e8f0';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = `w-4 h-4 rounded`;
+            checkbox.checked = activeFuncs.has(func.id);
+            checkbox.style.accentColor = func.color;
+            
+            checkbox.addEventListener('change', (e) => {
+                if(e.target.checked) activeFuncs.add(func.id);
+                else activeFuncs.delete(func.id);
+                label.style.borderColor = e.target.checked ? func.color : '#e2e8f0';
+                draw();
+            });
+
+            const span = document.createElement('span');
+            span.className = 'text-sm font-semibold math-text';
+            span.style.color = func.color;
+            span.textContent = func.name;
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            containers[func.category].appendChild(label);
+        });
+
+        // Sliders
+        const sliderA = document.getElementById('slider-A');
+        const sliderK = document.getElementById('slider-k');
+        const valA = document.getElementById('val-A');
+        const valK = document.getElementById('val-k');
+
+        sliderA.addEventListener('input', (e) => {
+            paramA = parseFloat(e.target.value);
+            valA.textContent = paramA;
+            draw();
+        });
+
+        sliderK.addEventListener('input', (e) => {
+            paramK = parseFloat(e.target.value);
+            valK.textContent = paramK;
+            draw();
+        });
+
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            scale = 60;
+            offsetX = 0;
+            offsetY = 0;
+            sliderA.value = 1; paramA = 1; valA.textContent = 1;
+            sliderK.value = 1; paramK = 1; valK.textContent = 1;
+            draw();
+        });
+    }
+
+    // Gestion du canevas
+    let width, height, originX, originY;
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        updateOrigin();
+        draw();
+    }
+
+    function updateOrigin() {
+        originX = width / 2 + offsetX;
+        originY = height / 2 + offsetY;
+    }
+
+    window.addEventListener('resize', resize);
+
+    // Dessin de la grille et des axes
+    function drawGrid() {
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.font = '12px sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        
+        // Espace entre les lignes de la grille (1 unité)
+        const step = scale;
+
+        // Lignes verticales
+        let startX = (originX % step) - step;
+        for (let x = startX; x < width + step; x += step) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            // Valeurs sur l'axe X
+            let mathX = Math.round((x - originX) / scale);
+            if (mathX !== 0 && originY > 0 && originY < height) {
+                ctx.fillText(mathX, x + 5, originY + 15);
+            }
+        }
+
+        // Lignes horizontales
+        let startY = (originY % step) - step;
+        for (let y = startY; y < height + step; y += step) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+            // Valeurs sur l'axe Y
+            let mathY = Math.round((originY - y) / scale);
+            if (mathY !== 0 && originX > 0 && originX < width) {
+                ctx.fillText(mathY, originX + 5, y - 5);
+            }
+        }
+
+        // Axes principaux
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(width, originY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, height); ctx.stroke();
+        
+        // Origine
+        if (originX > 0 && originX < width && originY > 0 && originY < height) {
+            ctx.fillText('0', originX + 5, originY + 15);
+        }
+    }
+
+    // Dessin d'une fonction mathématique
+    function drawFunction(funcObj) {
+        ctx.strokeStyle = funcObj.color;
+        ctx.lineWidth = 3;
+        
+        ctx.beginPath();
+        let isDrawing = false;
+        let prevY = null;
+
+        for (let px = 0; px <= width; px += 2) { // Pas de 2 pixels pour la performance
+            let mathX = (px - originX) / scale;
+            
+            // Calcul y = A * f(k * x)
+            let mathY = paramA * funcObj.fn(paramK * mathX);
+            
+            // Si la fonction n'est pas définie (ex: arcsin(2))
+            if (isNaN(mathY)) {
+                isDrawing = false;
+                prevY = null;
+                continue;
+            }
+
+            let py = originY - mathY * scale;
+
+            // Gestion des asymptotes verticales (très utile pour tan(x))
+            // Si la distance en Y entre deux points consécutifs est énorme, on coupe le trait
+            if (prevY !== null && Math.abs(py - prevY) > height / 2) {
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+            } else if (!isDrawing) {
+                ctx.moveTo(px, py);
+                isDrawing = true;
+            } else {
+                ctx.lineTo(px, py);
+            }
+            
+            prevY = py;
+        }
+        ctx.stroke();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        drawGrid();
+        
+        functionsList.forEach(func => {
+            if (activeFuncs.has(func.id)) {
+                drawFunction(func);
+            }
+        });
+    }
+
+    // Gestion du Drag & Pan (Déplacement)
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    const container = document.getElementById('canvas-container');
+
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => isDragging = false);
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        offsetX += e.clientX - lastMouseX;
+        offsetY += e.clientY - lastMouseY;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        updateOrigin();
+        draw();
+    });
+
+    // Gestion du Zoom avec la molette
+    container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        
+        const zoomIntensity = 0.1;
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        // Position de la souris dans le repère mathématique actuel
+        const mathX = (mouseX - originX) / scale;
+        const mathY = (originY - mouseY) / scale;
+
+        if (e.deltaY < 0) {
+            scale *= (1 + zoomIntensity); // Zoom In
+        } else {
+            scale *= (1 - zoomIntensity); // Zoom Out
+        }
+
+        // Limiter le scale pour éviter les bugs extrêmes
+        scale = Math.max(10, Math.min(scale, 500));
+
+        // Ajuster l'offset pour que le zoom se fasse vers la souris
+        offsetX = mouseX - width / 2 - mathX * scale;
+        offsetY = mouseY - height / 2 + mathY * scale;
+
+        updateOrigin();
+        draw();
+    }, { passive: false });
+
+    // Démarrage
+    initUI();
+    resize();
+
+</script>
+
+</body>
+</html>
