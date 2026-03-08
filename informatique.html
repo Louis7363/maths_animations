@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informatique MP2I - Animations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['Courier New', 'Consolas', 'Monaco', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #020617; /* slate-950 */ overflow-x: hidden; }
+        
+        /* Animations d'entrée pour les cartes */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-animate {
+            opacity: 0;
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Curseur clignotant façon terminal */
+        .blinking-cursor::after {
+            content: '_';
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        /* Effet Glow pour les bordures au survol */
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); /* Emerald glow */
+        }
+        .glow-red-hover:hover {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); /* Red glow for RB Tree */
+        }
+        
+        /* Style du fond réseau */
+        #network-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .content-wrapper { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh;}
+    </style>
+</head>
+<body class="text-slate-300 font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
+
+    <!-- Fond animé Graphe/Réseau -->
+    <canvas id="network-bg"></canvas>
+
+    <div class="content-wrapper">
+        <!-- En-tête du site -->
+        <header class="bg-slate-950/80 backdrop-blur-md shadow-sm border-b border-slate-800 sticky top-0 z-50 transition-all duration-300">
+            <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="index.html" class="mr-6 p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white font-mono tracking-tight flex items-center">
+                            <span class="text-emerald-500 mr-2">~/</span>informatique<span class="blinking-cursor text-emerald-500"></span>
+                        </h1>
+                    </div>
+                </div>
+                <div class="hidden md:flex text-sm font-mono text-slate-500">
+                    <span class="text-emerald-600">let</span> <span class="text-blue-400">mp2i</span> = <span class="text-orange-400">"Animations"</span>;;
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="max-w-6xl mx-auto px-6 py-12 flex-grow">
+            
+            <div class="mb-12 border-l-4 border-emerald-500 pl-6 py-2">
+                <h2 class="text-3xl font-bold text-white mb-2">Algorithmique & Structures de Données</h2>
+                <p class="text-lg text-slate-400">Visualisez l'exécution des algorithmes en temps réel pour mieux comprendre leur complexité et leur fonctionnement.</p>
+            </div>
+            
+            <!-- Grille des animations Informatique -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- 1. Arbre Rouge-Noir -->
+                <a href="arbre_rouge_noir.html" class="block group card-animate" style="animation-delay: 0.1s;">
+                    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-red-hover hover:-translate-y-1 hover:border-red-500/50 relative overflow-hidden flex flex-col">
+                        <!-- Accent visuel -->
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-red-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-black border border-slate-800 text-red-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-red-950 transition-colors duration-300 z-10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                            </div>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">O(log n)</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-white mb-2 z-10 flex items-center">
+                            <span class="text-red-500 mr-2">●</span> Arbre Rouge-Noir
+                        </h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
+                            Insertion étape par étape : visualisez le parcours, le recoloriage et les rotations (gauche/droite) pour maintenir l'équilibre parfait.
+                        </p>
+                        
+                        <div class="font-mono text-xs text-red-400 group-hover:text-red-300 transition-colors mt-auto z-10 flex items-center">
+                            > Lancer l'animation_
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 2. Parcours de Graphes (Prochainement) -->
+                <div class="block group card-animate opacity-75" style="animation-delay: 0.2s;">
+                    <div class="bg-slate-900/50 border border-slate-800 border-dashed p-6 rounded-2xl h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-slate-950 border border-slate-800 text-slate-500 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            </div>
+                            <span class="text-xs font-mono text-slate-600 bg-slate-950 px-2 py-1 rounded border border-slate-800">O(V + E)</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-400 mb-2">Parcours de Graphes</h3>
+                        <p class="text-slate-500 text-sm mb-6 flex-grow">
+                            Comparaison visuelle entre BFS (Largeur) et DFS (Profondeur) sur un labyrinthe ou un réseau complexe.
+                        </p>
+                        
+                        <div class="font-mono text-xs text-slate-600 mt-auto">
+                            // En cours de développement...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Automates Finis (Prochainement) -->
+                <div class="block group card-animate opacity-75" style="animation-delay: 0.3s;">
+                    <div class="bg-slate-900/50 border border-slate-800 border-dashed p-6 rounded-2xl h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-slate-950 border border-slate-800 text-slate-500 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                            </div>
+                            <span class="text-xs font-mono text-slate-600 bg-slate-950 px-2 py-1 rounded border border-slate-800">Regex</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-slate-400 mb-2">Automates (DFA/NFA)</h3>
+                        <p class="text-slate-500 text-sm mb-6 flex-grow">
+                            Tracez un mot à travers les états d'un automate fini déterministe. Visualisation de la déterminisation.
+                        </p>
+                        
+                        <div class="font-mono text-xs text-slate-600 mt-auto">
+                            // En cours de développement...
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- Pied de page -->
+        <footer class="mt-auto py-6 border-t border-slate-800 bg-slate-950/80 backdrop-blur-sm relative z-10 text-center">
+            <p class="text-slate-500 font-mono text-sm">
+                <span class="text-emerald-600">printf</span>(<span class="text-orange-400">"Créé pour la MP2I\\n"</span>);
+            </p>
+        </footer>
+    </div>
+
+    <!-- SCRIPT GÉRANT LE FOND ANIMÉ (Réseau de Noeuds / Graphe) -->
+    <script>
+        const canvas = document.getElementById('network-bg');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let nodes = [];
+        
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        class Node {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1.5;
+                // Couleurs inspirées du terminal (vert émeraude, cyan sombre)
+                this.color = Math.random() > 0.8 ? '#10b981' : '#334155'; 
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Rebondissement doux
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                
+                // Petit effet de lueur sur les noeuds verts
+                if (this.color === '#10b981') {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#10b981';
+                    ctx.fill();
+                    ctx.shadowBlur = 0; // Reset
+                }
+            }
+        }
+
+        function initNodes() {
+            nodes = [];
+            // Densité adaptée
+            const numNodes = Math.floor((width * height) / 15000); 
+            for (let i = 0; i < numNodes; i++) {
+                nodes.push(new Node());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            nodes.forEach(node => {
+                node.update();
+            });
+
+            // Dessiner les arêtes du graphe
+            ctx.lineWidth = 1;
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        const opacity = 1 - (distance / 120);
+                        // Arêtes vert sombre/cyan
+                        ctx.strokeStyle = `rgba(16, 185, 129, ${opacity * 0.3})`;
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Dessiner les noeuds par-dessus les arêtes
+            nodes.forEach(node => node.draw());
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            initNodes();
+        });
+
+        // Démarrage
+        resize();
+        initNodes();
+        animate();
+    </script>
+</body>
+</html>
