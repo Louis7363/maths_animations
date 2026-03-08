@@ -37,13 +37,12 @@
         }
         @keyframes blink { 50% { opacity: 0; } }
         
-        /* Effet Glow pour les bordures au survol */
-        .glow-hover:hover {
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); /* Emerald glow */
-        }
-        .glow-red-hover:hover {
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); /* Red glow for RB Tree */
-        }
+        /* Effets Glow pour les bordures au survol */
+        .glow-red-hover:hover { box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+        .glow-emerald-hover:hover { box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+        .glow-purple-hover:hover { box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); }
+        .glow-amber-hover:hover { box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
+        .glow-sky-hover:hover { box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); }
         
         /* Style du fond réseau */
         #network-bg {
@@ -87,7 +86,7 @@
             
             <div class="mb-12 border-l-4 border-emerald-500 pl-6 py-2">
                 <h2 class="text-3xl font-bold text-white mb-2">Algorithmique & Structures de Données</h2>
-                <p class="text-lg text-slate-400">Visualisez l'exécution des algorithmes en temps réel pour mieux comprendre leur complexité et leur fonctionnement.</p>
+                <p class="text-lg text-slate-400">Visualisez l'exécution des algorithmes en temps réel pour mieux comprendre leur complexité et leur fonctionnement en mémoire.</p>
             </div>
             
             <!-- Grille des animations Informatique -->
@@ -96,7 +95,6 @@
                 <!-- 1. Arbre Rouge-Noir -->
                 <a href="arbre_rouge_noir.html" class="block group card-animate" style="animation-delay: 0.1s;">
                     <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-red-hover hover:-translate-y-1 hover:border-red-500/50 relative overflow-hidden flex flex-col">
-                        <!-- Accent visuel -->
                         <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-red-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
                         
                         <div class="flex items-center justify-between mb-4">
@@ -114,16 +112,112 @@
                         </p>
                         
                         <div class="font-mono text-xs text-red-400 group-hover:text-red-300 transition-colors mt-auto z-10 flex items-center">
-                            > Lancer l'animation_
+                            > ./run_animation_
                         </div>
                     </div>
                 </a>
 
-                
+                <!-- 2. Tri par Insertion -->
+                <a href="tri_insertion.html" class="block group card-animate" style="animation-delay: 0.2s;">
+                    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-emerald-hover hover:-translate-y-1 hover:border-emerald-500/50 relative overflow-hidden flex flex-col">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-black border border-slate-800 text-emerald-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-emerald-950 transition-colors duration-300 z-10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h4"></path></svg>
+                            </div>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">O(n²)</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-white mb-2 z-10 flex items-center">
+                            <span class="text-emerald-500 mr-2">█</span> Tri par Insertion
+                        </h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
+                            L'algorithme classique où l'on extrait une carte pour l'insérer à sa juste place parmi les éléments déjà triés.
+                        </p>
+                        
+                        <div class="font-mono text-xs text-emerald-400 group-hover:text-emerald-300 transition-colors mt-auto z-10 flex items-center">
+                            > ./run_animation_
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 3. Tri Fusion -->
+                <a href="tri_fusion.html" class="block group card-animate" style="animation-delay: 0.3s;">
+                    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-purple-hover hover:-translate-y-1 hover:border-purple-500/50 relative overflow-hidden flex flex-col">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-black border border-slate-800 text-purple-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-purple-950 transition-colors duration-300 z-10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v4M8 11l4 4M16 7v4M16 11l-4 4"></path></svg>
+                            </div>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">O(n log n)</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-white mb-2 z-10 flex items-center">
+                            <span class="text-purple-500 mr-2">⋈</span> Tri Fusion
+                        </h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
+                            Diviser pour régner ! Observez la formation de l'arbre de récursion et la fusion des sous-tableaux étage par étage.
+                        </p>
+                        
+                        <div class="font-mono text-xs text-purple-400 group-hover:text-purple-300 transition-colors mt-auto z-10 flex items-center">
+                            > ./run_animation_
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 4. Tri à Bulles -->
+                <a href="tri_bulles.html" class="block group card-animate" style="animation-delay: 0.4s;">
+                    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-amber-hover hover:-translate-y-1 hover:border-amber-500/50 relative overflow-hidden flex flex-col">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-black border border-slate-800 text-amber-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-amber-950 transition-colors duration-300 z-10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                            </div>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">O(n²)</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-white mb-2 z-10 flex items-center">
+                            <span class="text-amber-500 mr-2">○</span> Tri à Bulles
+                        </h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
+                            Parcours de droite à gauche avec échanges horizontaux. Les éléments les plus légers remontent à la surface un par un.
+                        </p>
+                        
+                        <div class="font-mono text-xs text-amber-400 group-hover:text-amber-300 transition-colors mt-auto z-10 flex items-center">
+                            > ./run_animation_
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 5. Tri par Tas Min -->
+                <a href="tri_tas.html" class="block group card-animate" style="animation-delay: 0.5s;">
+                    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-sky-hover hover:-translate-y-1 hover:border-sky-500/50 relative overflow-hidden flex flex-col">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-black border border-slate-800 text-sky-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-sky-950 transition-colors duration-300 z-10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3L4 15h16L12 3z"></path></svg>
+                            </div>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">O(n log n)</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-white mb-2 z-10 flex items-center">
+                            <span class="text-sky-500 mr-2">▲</span> Tri par Tas Min
+                        </h3>
+                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
+                            Extraction du minimum et tamisage. Animation synchronisée montrant l'arbre binaire virtuel et la mémoire contiguë.
+                        </p>
+                        
+                        <div class="font-mono text-xs text-sky-400 group-hover:text-sky-300 transition-colors mt-auto z-10 flex items-center">
+                            > ./run_animation_
+                        </div>
+                    </div>
+                </a>
 
                
-                </div>
-
             </div>
 
         </main>
