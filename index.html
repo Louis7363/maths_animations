@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animations Interactives - MP2I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; overflow-x: hidden; }
+        
+        /* Animations d'entrée pour les grandes cartes */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-animate {
+            opacity: 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        /* Style du fond mathématique/informatique */
+        #math-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .content-wrapper { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh;}
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Fond animé -->
+    <canvas id="math-bg"></canvas>
+
+    <div class="content-wrapper">
+        <!-- En-tête du site -->
+        <header class="bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200 sticky top-0 z-50 transition-all duration-300">
+            <div class="max-w-6xl mx-auto px-6 py-6">
+                <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-700 tracking-tight flex items-center">
+                    <!-- Icône globale -->
+                    <svg class="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    Portail Interactif MP2I
+                </h1>
+                <p class="text-slate-500 mt-2 text-lg font-medium">L'outil de visualisation pour les classes préparatoires.</p>
+            </div>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="max-w-6xl mx-auto px-6 py-16 flex-grow flex flex-col justify-center">
+            
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black text-slate-800 mb-4 tracking-tight">Choisissez votre matière</h2>
+                <p class="text-xl text-slate-600 max-w-2xl mx-auto">Explorez des concepts abstraits grâce à des animations interactives manipulables en temps réel.</p>
+            </div>
+            
+            <!-- Grille des matières principales -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- CARTE 1 : MATHÉMATIQUES -->
+                <a href="maths.html" class="block group card-animate" style="animation-delay: 0.1s;">
+                    <div class="bg-white/85 backdrop-blur-md rounded-3xl shadow-lg border border-blue-100 p-8 h-full transition-all duration-300 hover:shadow-2xl hover:border-blue-400 hover:-translate-y-2 flex flex-col items-center text-center relative overflow-hidden">
+                        <!-- Décoration de fond -->
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-bl from-blue-100 to-transparent rounded-full opacity-60"></div>
+                        
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300 z-10">
+                            <!-- Icône Fonction / Courbe -->
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3 z-10">Mathématiques</h3>
+                        <p class="text-slate-600 text-md mb-6 flex-grow z-10">
+                            Algèbre linéaire, Analyse, Suites, Convexité... Visualisez les théorèmes fondamentaux.
+                        </p>
+                        <div class="inline-flex items-center text-blue-600 font-semibold mt-auto z-10 bg-blue-50 px-4 py-2 rounded-full group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                            Ouvrir la galerie
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- CARTE 2 : INFORMATIQUE -->
+                <a href="info.html" class="block group card-animate" style="animation-delay: 0.2s;">
+                    <div class="bg-white/85 backdrop-blur-md rounded-3xl shadow-lg border border-emerald-100 p-8 h-full transition-all duration-300 hover:shadow-2xl hover:border-emerald-400 hover:-translate-y-2 flex flex-col items-center text-center relative overflow-hidden">
+                        <!-- Décoration de fond -->
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-bl from-emerald-100 to-transparent rounded-full opacity-60"></div>
+                        
+                        <div class="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300 z-10">
+                            <!-- Icône Arbre / Algo -->
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3 z-10">Informatique MP2I</h3>
+                        <p class="text-slate-600 text-md mb-6 flex-grow z-10">
+                            Structures de données, Algorithmes, Arbres Rouges-Noirs, Graphes et Automates.
+                        </p>
+                        <div class="inline-flex items-center text-emerald-600 font-semibold mt-auto z-10 bg-emerald-50 px-4 py-2 rounded-full group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+                            Ouvrir la galerie
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- CARTE 3 : PHYSIQUE -->
+                <a href="physique.html" class="block group card-animate" style="animation-delay: 0.3s;">
+                    <div class="bg-white/85 backdrop-blur-md rounded-3xl shadow-lg border border-amber-100 p-8 h-full transition-all duration-300 hover:shadow-2xl hover:border-amber-400 hover:-translate-y-2 flex flex-col items-center text-center relative overflow-hidden">
+                        <!-- Décoration de fond -->
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-bl from-amber-100 to-transparent rounded-full opacity-60"></div>
+                        
+                        <div class="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300 z-10">
+                            <!-- Icône Atome / Onde -->
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.017 18L14.017 21.369 9.983 21.369 9.983 18 2.222 13.515 3.93 10.559 10 14.062 10 7.058 6.002 4.752 7.712 1.795 12 4.27 16.288 1.795 17.998 4.752 14 7.058 14 14.062 20.07 10.559 21.778 13.515 14.017 18zM12 11.5c-1.381 0-2.5 1.119-2.5 2.5s1.119 2.5 2.5 2.5 2.5-1.119 2.5-2.5-1.119-2.5-2.5-2.5z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3 z-10">Physique & Chimie</h3>
+                        <p class="text-slate-600 text-md mb-6 flex-grow z-10">
+                            Mécanique classique, Électromagnétisme, Optique, Ondes et Thermodynamique.
+                        </p>
+                        <div class="inline-flex items-center text-amber-600 font-semibold mt-auto z-10 bg-amber-50 px-4 py-2 rounded-full group-hover:bg-amber-600 group-hover:text-white transition-colors duration-300">
+                            Bientôt disponible
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+
+            <!-- SECTION : Contact / Suggestion -->
+            <section class="mt-24 relative overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl shadow-xl border border-slate-700 p-10 text-center card-animate" style="animation-delay: 0.4s;">
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-indigo-500 opacity-10 blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-blue-500 opacity-10 blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-md border border-white/10">
+                        <svg class="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-bold text-white mb-4">Contribuer au projet</h2>
+                    <p class="text-slate-300 mb-8 max-w-2xl mx-auto text-lg">
+                        Vous avez une idée d'animation pour illustrer un concept difficile du programme ? Un bug à signaler ? Contactez-moi pour l'ajouter au catalogue !
+                    </p>
+                    
+                    <a href="mailto:louisprogrammation@proton.me?subject=Suggestion%20d'animation%20MP2I" 
+                       class="inline-flex items-center px-8 py-4 bg-white text-slate-900 font-bold rounded-xl shadow-lg hover:bg-slate-50 hover:scale-105 hover:shadow-blue-500/20 transition-all duration-300 group">
+                        <svg class="w-5 h-5 mr-3 text-blue-600 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        Envoyer un e-mail
+                    </a>
+                    
+                    <p class="mt-6 text-slate-400 text-sm font-medium">louisprogrammation@proton.me</p>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Pied de page -->
+        <footer class="mt-auto py-8 text-center border-t border-slate-200 bg-white/80 backdrop-blur-sm relative z-10">
+            <p class="text-slate-500 font-medium">Créé pour mieux comprendre les sciences en CPGE.</p>
+            <p class="text-slate-400 text-sm mt-2">© Portail Interactif MP2I</p>
+        </footer>
+    </div>
+
+    <!-- SCRIPT GÉRANT LE FOND ANIMÉ -->
+    <script>
+        const canvas = document.getElementById('math-bg');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        const symbols = ['∫', '∑', 'π', '∞', '≈', '∆', 'θ', 'λ', 'μ', 'σ', 'e', 'x', 'y', 'f(x)', '∈', '{ }', '</>', 'O(n)', 'λx', 'ψ', 'Ω', 'ℏ'];
+        
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+                this.size = Math.random() * 2 + 1;
+                this.isSymbol = Math.random() > 0.70; // 30% de chance d'être un symbole
+                this.symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                this.alpha = Math.random() * 0.4 + 0.1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Rebondissement fluide
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                if (this.isSymbol) {
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = `${this.size * 8}px 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`;
+                    ctx.fillText(this.symbol, this.x, this.y);
+                } else {
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const numParticles = Math.floor((width * height) / 20000); 
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 150) {
+                        const opacity = 1 - (distance / 150);
+                        ctx.strokeStyle = `rgba(148, 163, 184, ${opacity * 0.2})`;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            initParticles();
+        });
+
+        resize();
+        initParticles();
+        animate();
+    </script>
+</body>
+</html>
