@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inégalité de Jensen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #canvas-container { position: relative; width: 100vw; height: 100vh; cursor: grab; }
+        #canvas-container:active { cursor: grabbing; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 420px;
+            pointer-events: auto;
+            border: 1px solid #e2e8f0;
+            max-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+        .math-text { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container">
+    <canvas id="graphCanvas"></canvas>
+    
+    <div id="ui-panel">
+        <div class="flex items-center justify-between mb-4 flex-shrink-0">
+            <h1 class="text-xl font-bold text-slate-800">Inégalité de Jensen</h1>
+            <a href="index.html" class="text-sm text-blue-600 hover:underline">Retour</a>
+        </div>
+        
+        <p class="text-sm text-slate-600 mb-4 pb-4 border-b border-slate-200 flex-shrink-0">
+            Pour une fonction convexe, le segment reliant deux points de la courbe est toujours situé <strong>au-dessus</strong> de la courbe.
+        </p>
+
+        <div class="flex-shrink-0 space-y-4">
+            <!-- Curseur Point A -->
+            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-semibold text-blue-800">Position de a</span>
+                    <span class="text-sm font-bold text-blue-600" id="val-a">-3.0</span>
+                </div>
+                <input type="range" id="slider-a" min="-6" max="6" step="0.1" value="-3" class="w-full accent-blue-500">
+            </div>
+
+            <!-- Curseur Point B -->
+            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-semibold text-indigo-800">Position de b</span>
+                    <span class="text-sm font-bold text-indigo-600" id="val-b">4.0</span>
+                </div>
+                <input type="range" id="slider-b" min="-6" max="6" step="0.1" value="4" class="w-full accent-indigo-500">
+            </div>
+
+            <!-- Curseur t (Barycentre) -->
+            <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-semibold text-amber-800">Poids (t)</span>
+                    <span class="text-sm font-bold text-amber-600" id="val-t">0.5</span>
+                </div>
+                <input type="range" id="slider-t" min="0" max="1" step="0.01" value="0.5" class="w-full accent-amber-500">
+                <div class="text-xs text-amber-700 mt-1 text-center">x = (1-t)a + t(b)</div>
+            </div>
+
+            <!-- Affichage des calculs -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Comparaison (f(x) = x²/2)</label>
+                <div class="p-3 bg-white rounded border border-slate-200 math-text text-sm space-y-3" id="math-display">
+                    <!-- Généré dynamiquement -->
+                </div>
+            </div>
+
+            <button id="btn-reset" class="w-full py-2 px-2 bg-white border border-slate-300 rounded text-sm hover:bg-slate-100 transition mt-2">
+                Recentrer la vue
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Fonction convexe f(x) = x^2 / 2
+    const f = x => (x * x) / 2;
+
+    // État
+    let paramA = -3.0;
+    let paramB = 4.0;
+    let paramT = 0.5;
+
+    // Paramètres de vue
+    let scale = 60;
+    let offsetX = 0;
+    let offsetY = 150; // Décalé pour voir le bas de la parabole
+    let width, height, originX, originY;
+
+    // Éléments UI
+    const sliderA = document.getElementById('slider-a');
+    const sliderB = document.getElementById('slider-b');
+    const sliderT = document.getElementById('slider-t');
+    const valA = document.getElementById('val-a');
+    const valB = document.getElementById('val-b');
+    const valT = document.getElementById('val-t');
+    const mathDisplay = document.getElementById('math-display');
+
+    function updateMath() {
+        valA.textContent = paramA.toFixed(1);
+        valB.textContent = paramB.toFixed(1);
+        valT.textContent = paramT.toFixed(2);
+        
+        // Barycentre en x
+        const xt = (1 - paramT) * paramA + paramT * paramB;
+        
+        // Valeur de la fonction au barycentre (Point P)
+        const f_xt = f(xt);
+        
+        // Barycentre des valeurs de la fonction (Point Q sur la sécante)
+        const t_fa_fb = (1 - paramT) * f(paramA) + paramT * f(paramB);
+        
+        mathDisplay.innerHTML = `
+            <div>
+                <span class="text-slate-500">Point M sur l'axe x :</span><br>
+                x = <span class="text-amber-600">${xt.toFixed(2)}</span>
+            </div>
+            <div class="flex items-center justify-between border-t pt-2 border-slate-100">
+                <div class="text-emerald-600">
+                    <strong>Sur la courbe :</strong><br>
+                    f(x) = ${f_xt.toFixed(2)}
+                </div>
+                <div class="text-2xl font-black text-slate-300">≤</div>
+                <div class="text-rose-600 text-right">
+                    <strong>Sur la corde :</strong><br>
+                    y = ${t_fa_fb.toFixed(2)}
+                </div>
+            </div>
+            <div class="text-center mt-2 p-1 bg-slate-50 rounded text-xs text-slate-600">
+                f((1-t)a + tb) &nbsp; <strong>≤</strong> &nbsp; (1-t)f(a) + t f(b)
+            </div>
+        `;
+    }
+
+    sliderA.addEventListener('input', (e) => { paramA = parseFloat(e.target.value); updateMath(); draw(); });
+    sliderB.addEventListener('input', (e) => { paramB = parseFloat(e.target.value); updateMath(); draw(); });
+    sliderT.addEventListener('input', (e) => { paramT = parseFloat(e.target.value); updateMath(); draw(); });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+        scale = 60; offsetX = 0; offsetY = 150; updateOrigin(); draw();
+    });
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        updateOrigin();
+        draw();
+    }
+
+    function updateOrigin() {
+        originX = width / 2 + offsetX;
+        originY = height / 2 + offsetY;
+    }
+
+    window.addEventListener('resize', resize);
+
+    function drawGrid() {
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.font = '12px sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        const step = scale;
+        let startX = (originX % step) - step;
+        for (let x = startX; x < width + step; x += step) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            let mathX = Math.round((x - originX) / scale);
+            if (mathX !== 0 && originY > 0 && originY < height) ctx.fillText(mathX, x + 5, originY + 15);
+        }
+        let startY = (originY % step) - step;
+        for (let y = startY; y < height + step; y += step) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+            let mathY = Math.round((originY - y) / scale);
+            if (mathY !== 0 && originX > 0 && originX < width) ctx.fillText(mathY, originX + 5, y - 5);
+        }
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(width, originY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, height); ctx.stroke();
+        if (originX > 0 && originX < width && originY > 0 && originY < height) ctx.fillText('0', originX + 5, originY + 15);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        drawGrid();
+        
+        // Tracer la fonction f(x)
+        ctx.strokeStyle = '#93C5FD'; // Bleu clair
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        for (let px = 0; px <= width; px += 2) {
+            let mathX = (px - originX) / scale;
+            let mathY = f(mathX);
+            let py = originY - mathY * scale;
+            if (px === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        const a = paramA;
+        const fa = f(a);
+        const b = paramB;
+        const fb = f(b);
+        const t = paramT;
+
+        const pA_screen = { x: originX + a * scale, y: originY - fa * scale };
+        const pB_screen = { x: originX + b * scale, y: originY - fb * scale };
+
+        // Tracer la corde (segment AB)
+        ctx.strokeStyle = '#CBD5E1'; // Gris
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        ctx.moveTo(pA_screen.x, pA_screen.y);
+        ctx.lineTo(pB_screen.x, pB_screen.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Points A et B
+        ctx.fillStyle = '#3B82F6';
+        ctx.beginPath(); ctx.arc(pA_screen.x, pA_screen.y, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(pB_screen.x, pB_screen.y, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#1E3A8A'; ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('A', pA_screen.x - 20, pA_screen.y - 10);
+        ctx.fillText('B', pB_screen.x + 10, pB_screen.y - 10);
+
+        // Position t
+        const xt = (1 - t) * a + t * b;
+        const f_xt = f(xt);
+        const t_fa_fb = (1 - t) * fa + t * fb;
+
+        const pM_screen = { x: originX + xt * scale, y: originY };
+        const pCurve_screen = { x: originX + xt * scale, y: originY - f_xt * scale };
+        const pChord_screen = { x: originX + xt * scale, y: originY - t_fa_fb * scale };
+
+        // Ligne verticale de repérage
+        ctx.strokeStyle = '#F59E0B'; // Ambre
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pM_screen.x, pM_screen.y);
+        ctx.lineTo(pM_screen.x, pChord_screen.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // M sur l'axe x
+        ctx.fillStyle = '#F59E0B';
+        ctx.beginPath(); ctx.arc(pM_screen.x, pM_screen.y, 5, 0, Math.PI * 2); ctx.fill();
+
+        // P sur la courbe
+        ctx.fillStyle = '#10B981'; // Émeraude
+        ctx.beginPath(); ctx.arc(pCurve_screen.x, pCurve_screen.y, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+
+        // Q sur la corde
+        ctx.fillStyle = '#E11D48'; // Rose/Rouge
+        ctx.beginPath(); ctx.arc(pChord_screen.x, pChord_screen.y, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    // Gestion du Pan & Zoom
+    let isDragging = false;
+    let lastMouseX = 0, lastMouseY = 0;
+    const container = document.getElementById('canvas-container');
+    container.addEventListener('mousedown', (e) => { isDragging = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        offsetX += e.clientX - lastMouseX; offsetY += e.clientY - lastMouseY;
+        lastMouseX = e.clientX; lastMouseY = e.clientY;
+        updateOrigin(); draw();
+    });
+    container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const mouseX = e.clientX, mouseY = e.clientY;
+        const mathX = (mouseX - originX) / scale, mathY = (originY - mouseY) / scale;
+        if (e.deltaY < 0) scale *= 1.1; else scale *= 0.9;
+        scale = Math.max(10, Math.min(scale, 500));
+        offsetX = mouseX - width / 2 - mathX * scale; offsetY = mouseY - height / 2 + mathY * scale;
+        updateOrigin(); draw();
+    }, { passive: false });
+
+    // Init
+    updateMath();
+    resize();
+</script>
+</body>
+</html>
