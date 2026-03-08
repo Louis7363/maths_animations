@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sommes Télescopiques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            margin: 0; 
+            background-color: #f8fafc; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+        
+        /* Panneau UI maintenant intégré dans le flux (ne flotte plus par-dessus) */
+        #ui-panel {
+            width: 360px;
+            min-width: 360px;
+            background: white;
+            padding: 24px;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        /* Conteneur principal façon tableau blanc */
+        #whiteboard { 
+            flex: 1;
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start; /* Évite de cacher le début si ça déborde */
+            padding: 40px;
+            overflow: auto; /* Permet de scroller si l'équation est très longue */
+        }
+        
+        .math-text { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+
+        /* --- Styles pour l'animation algébrique --- */
+        .fadeable {
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 150px;
+            opacity: 1;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* Classe appliquée lors du "télescopage" (rétrécissement) */
+        .faded {
+            opacity: 0 !important;
+            max-width: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            transform: scale(0) !important;
+            border: none !important;
+        }
+
+        /* Effet de rature rouge */
+        .slash-target {
+            position: relative;
+        }
+        
+        .slash-target::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -10%;
+            width: 120%;
+            height: 3px;
+            background-color: #ef4444; /* Rouge Tailwind */
+            border-radius: 2px;
+            transform: rotate(-30deg) scaleX(0);
+            transform-origin: center;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .slashed::after {
+            transform: rotate(-30deg) scaleX(1);
+        }
+        
+        /* Personnalisation de l'affichage mathématique */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 4px;
+        }
+        .fraction .num { border-bottom: 2px solid #1e293b; padding: 0 4px; line-height: 1.1; }
+        .fraction .den { padding: 0 4px; line-height: 1.1; }
+        .root-symbol { margin-right: 2px; }
+        .root-inner { border-top: 2px solid #1e293b; padding: 0 4px; margin-left: -2px; }
+    </style>
+</head>
+<body>
+
+    <!-- Panneau de contrôle (maintenant à gauche et fixe) -->
+    <div id="ui-panel">
+        <div class="flex items-center justify-between mb-4 flex-shrink-0">
+            <h1 class="text-xl font-bold text-slate-800">Sommes Télescopiques</h1>
+            <a href="index.html" class="text-sm text-blue-600 hover:underline">Retour</a>
+        </div>
+        
+        <p class="text-sm text-slate-600 mb-4 pb-4 border-b border-slate-200 flex-shrink-0">
+            Une somme est "télescopique" lorsque chaque terme annule une partie du terme suivant. Observez l'effondrement !
+        </p>
+
+        <div class="flex-shrink-0 space-y-4">
+            
+            <!-- Sélecteur de suites -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Choix de la somme</label>
+                <select id="seq-select" class="w-full p-2 border border-slate-300 rounded bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="frac">Fractions : 1/k - 1/(k+1)</option>
+                    <option value="sqrt">Racines : √(k+1) - √k</option>
+                    <option value="ln">Logarithmes : ln(k+1) - ln(k)</option>
+                </select>
+            </div>
+
+            <!-- Curseur N -->
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mt-2">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-semibold text-slate-800">Nombre de termes (N)</span>
+                    <span class="text-lg font-bold text-slate-700" id="val-n">5</span>
+                </div>
+                <!-- Limité à 8 pour que ça tienne bien à l'écran -->
+                <input type="range" id="slider-n" min="2" max="8" step="1" value="5" class="w-full accent-slate-500">
+            </div>
+
+            <!-- Boutons d'action -->
+            <button id="btn-animate" class="w-full py-3 px-4 bg-rose-500 text-white font-bold rounded-lg shadow hover:bg-rose-600 transition duration-200 flex justify-center items-center">
+                <span>Animer l'annulation !</span>
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+
+            <button id="btn-reset" class="w-full py-2 px-2 bg-white border border-slate-300 text-slate-600 rounded text-sm hover:bg-slate-100 transition">
+                Réinitialiser la vue
+            </button>
+
+            <!-- Explication -->
+            <div class="mt-4 p-3 bg-blue-50 border border-blue-100 rounded text-sm text-blue-800" id="explication-box">
+                <!-- Dynamique -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau blanc où s'affiche l'algèbre -->
+    <div id="whiteboard"></div>
+
+<script>
+    // Définition des différentes sommes télescopiques
+    const sequences = {
+        'frac': {
+            renderPos: k => `<div class="fraction"><span class="num">1</span><span class="den">${k}</span></div>`,
+            renderNeg: k => `<div class="fraction"><span class="num">1</span><span class="den">${k+1}</span></div>`,
+            cancelType: 'neg-pos', // Le NÉGATIF du terme k annule le POSITIF du terme k+1
+            finalResultHTML: n => `<div class="fraction"><span class="num">n</span><span class="den">n+1</span></div>`,
+            explanation: "Ici, le -1/(k+1) du terme k s'annule avec le +1/(k+1) du terme k+1. Il ne reste que le tout premier et le tout dernier bout !"
+        },
+        'sqrt': {
+            renderPos: k => `<div class="inline-flex items-center text-2xl"><span class="root-symbol">&radic;</span><span class="root-inner">${k+1}</span></div>`,
+            renderNeg: k => `<div class="inline-flex items-center text-2xl"><span class="root-symbol">&radic;</span><span class="root-inner">${k}</span></div>`,
+            cancelType: 'pos-neg', // Le POSITIF du terme k annule le NÉGATIF du terme k+1
+            finalResultHTML: n => `<div class="inline-flex items-center text-2xl"><span class="root-symbol">&radic;</span><span class="root-inner">${n+1}</span><span class="ml-2">- 1</span></div>`,
+            explanation: "Ici, c'est le terme positif √(k+1) qui va s'annuler avec le terme négatif -√(k+1) de la parenthèse suivante."
+        },
+        'ln': {
+            renderPos: k => `<span>ln(${k+1})</span>`,
+            renderNeg: k => `<span>ln(${k})</span>`,
+            cancelType: 'pos-neg',
+            finalResultHTML: n => `<span>ln(${n+1})</span>`,
+            explanation: "Rappel : ln(a/b) = ln(a) - ln(b). La somme des logarithmes est un exemple classique de télescopage."
+        }
+    };
+
+    let currentSeq = 'frac';
+    let currentN = 5;
+    let isAnimating = false;
+
+    // Éléments du DOM
+    const whiteboard = document.getElementById('whiteboard');
+    const selectSeq = document.getElementById('seq-select');
+    const sliderN = document.getElementById('slider-n');
+    const valN = document.getElementById('val-n');
+    const btnAnimate = document.getElementById('btn-animate');
+    const btnReset = document.getElementById('btn-reset');
+    const explicationBox = document.getElementById('explication-box');
+
+    // Générer l'affichage mathématique
+    function generateMath() {
+        whiteboard.innerHTML = '';
+        const seq = sequences[currentSeq];
+        const n = currentN;
+        explicationBox.textContent = seq.explanation;
+
+        // Container principal pour l'équation (adaptatif au scroll si trop long)
+        let html = `<div class="flex items-center text-3xl font-serif text-slate-800" style="margin: auto; line-height: 2.5; width: max-content; padding-right: 40px;">`;
+
+        // Symbole Sigma
+        html += `
+            <div class="flex items-center mr-6">
+                <div class="flex flex-col items-center text-base mr-2">
+                    <span class="font-sans">n=${n}</span>
+                    <span class="text-6xl leading-none font-sans font-normal my-1">&Sigma;</span>
+                    <span class="font-sans">k=1</span>
+                </div>
+                <span class="mx-4">=</span>
+            </div>
+        `;
+
+        // Génération des termes de 1 à N
+        for(let k = 1; k <= n; k++) {
+            // CORRECTION BUG 2 : Le conteneur "term" n'a plus la classe "fadeable".
+            // Il va simplement s'adapter aux éléments enfants qui disparaissent.
+            html += `<div class="inline-flex items-center" id="term-${k}">`;
+            
+            html += `<span class="paren fadeable mx-1 text-slate-400" id="lparen-${k}">(</span>`;
+            
+            html += `<div class="slash-target fadeable transition-all duration-700" id="pos-${k}">
+                        ${seq.renderPos(k)}
+                     </div>`;
+                     
+            html += `<span class="mx-2 fadeable transition-all duration-700" id="minus-${k}">-</span>`;
+            
+            html += `<div class="slash-target fadeable transition-all duration-700" id="neg-${k}">
+                        ${seq.renderNeg(k)}
+                     </div>`;
+                     
+            html += `<span class="paren fadeable mx-1 text-slate-400" id="rparen-${k}">)</span>`;
+            
+            html += `</div>`;
+
+            // Signe + entre les termes
+            if(k < n) {
+                html += `<span class="mx-3 fadeable plus-sign transition-all duration-700 text-slate-400" id="plus-${k}">+</span>`;
+            }
+        }
+
+        // Bloc du résultat final (caché au début)
+        html += `<div id="final-result" class="opacity-0 max-w-0 overflow-hidden transition-all duration-1000 whitespace-nowrap ml-4 text-rose-600 font-bold flex items-center">`;
+        html += `<span class="mx-4 text-slate-800">=</span> ${seq.finalResultHTML(n)}`;
+        html += `</div>`;
+
+        html += `</div>`;
+        whiteboard.innerHTML = html;
+
+        // Réinitialiser l'état
+        isAnimating = false;
+        btnAnimate.disabled = false;
+        btnAnimate.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    // Animation du télescopage
+    async function animateTelescope() {
+        if(isAnimating) return;
+        isAnimating = true;
+        
+        btnAnimate.disabled = true;
+        btnAnimate.classList.add('opacity-50', 'cursor-not-allowed');
+
+        const seq = sequences[currentSeq];
+        const n = currentN;
+
+        // ÉTAPE 1 : Raturer les termes consécutifs
+        for(let k = 1; k < n; k++) {
+            let el1, el2;
+            if(seq.cancelType === 'neg-pos') {
+                el1 = document.getElementById(`neg-${k}`);
+                el2 = document.getElementById(`pos-${k+1}`);
+            } else {
+                el1 = document.getElementById(`pos-${k}`);
+                el2 = document.getElementById(`neg-${k+1}`);
+            }
+            
+            if(el1) el1.classList.add('slashed');
+            if(el2) el2.classList.add('slashed');
+
+            // Petite pause entre chaque rature pour l'effet visuel
+            await new Promise(r => setTimeout(r, 400));
+        }
+
+        // Pause pour admirer le massacre
+        await new Promise(r => setTimeout(r, 1200));
+
+        // ÉTAPE 2 : Effondrement (Télescopage physique)
+        
+        // On détermine quels éléments DOIVENT SURVIVRE
+        const survivors = new Set();
+        
+        if(seq.cancelType === 'neg-pos') {
+            // Survient : pos_1, et (minus_N, neg_N)
+            survivors.add(`pos-1`);
+            survivors.add(`minus-${n}`);
+            survivors.add(`neg-${n}`);
+        } else {
+            // Survient : (minus_1, neg_1), et (plus_N-1, pos_N)
+            survivors.add(`minus-1`);
+            survivors.add(`neg-1`);
+            survivors.add(`plus-${n-1}`);
+            survivors.add(`pos-${n}`);
+        }
+
+        // Appliquer la classe 'faded' à tous les éléments non-survivants
+        document.querySelectorAll('.fadeable').forEach(el => {
+            // On fait aussi disparaître les parenthèses pour un rendu final propre
+            if(!survivors.has(el.id) || el.id.startsWith('lparen') || el.id.startsWith('rparen')) {
+                el.classList.add('faded');
+            }
+        });
+
+        // ÉTAPE 3 : Afficher le bloc du résultat simplifié
+        await new Promise(r => setTimeout(r, 800));
+        const finalEq = document.getElementById('final-result');
+        finalEq.classList.remove('opacity-0', 'max-w-0');
+        finalEq.classList.add('opacity-100');
+        finalEq.style.maxWidth = '300px'; // Laisse la place au flexbox de s'étendre
+    }
+
+    // Écouteurs d'événements
+    selectSeq.addEventListener('change', (e) => { 
+        currentSeq = e.target.value; 
+        generateMath(); 
+    });
+    
+    sliderN.addEventListener('input', (e) => { 
+        currentN = parseInt(e.target.value); 
+        valN.textContent = currentN;
+        generateMath(); 
+    });
+
+    btnAnimate.addEventListener('click', animateTelescope);
+    btnReset.addEventListener('click', generateMath);
+
+    // Initialisation
+    generateMath();
+
+</script>
+</body>
+</html>
