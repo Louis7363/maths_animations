@@ -234,8 +234,9 @@
             computePositions(node.right, depth + 1, node.targetX, maxX);
         }
 
-        // On laisse une marge sur les côtés
-        computePositions(tree.root, 0, 100, width - 400); // -400 pour le panneau de droite
+        // On laisse une marge sur les côtés pour éviter que les panneaux ne cachent l'arbre
+        // Panneau gauche ~350px (on prend 400), Panneau droit ~320px (on prend width - 360)
+        computePositions(tree.root, 0, 400, width - 360); 
     }
 
     // Boucle de rendu principal (60 FPS) indépendante de la logique
