@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floyd-Warshall - Informatique MP2I</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX pour les formules mathématiques -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        ide: {
+                            bg: '#000000',
+                            card: '#0a0a0a',
+                            border: '#1f1f22',
+                            text: '#a1a1aa',
+                            accent: '#a855f7', // Purple
+                            blue: '#3b82f6',   // Blue for 'i'
+                            pink: '#ec4899',   // Pink for 'j'
+                            green: '#10b981',  // Green for updates
+                            keyword: '#ec4899',
+                            string: '#10b981',
+                            comment: '#52525b',
+                            func: '#60a5fa'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #000000; color: #a1a1aa; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #1f1f22; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+        .glass-panel {
+            background: linear-gradient(180deg, rgba(24,24,27,0.6) 0%, rgba(10,10,10,0.9) 100%);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .matrix-cell { transition: all 0.3s ease; }
+        .cell-highlight-k { background-color: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #d8b4fe; }
+        .cell-highlight-i { background-color: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #93c5fd; }
+        .cell-highlight-j { background-color: rgba(236, 72, 153, 0.2); border-color: #ec4899; color: #f9a8d4; }
+        .cell-updated { background-color: rgba(16, 185, 129, 0.3); border-color: #10b981; color: #a7f3d0; transform: scale(1.1); z-index: 10; font-weight: bold; }
+        
+        .code-block { tab-size: 4; }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-ide-accent/30 selection:text-white h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="border-b border-white/5 bg-black/80 backdrop-blur-xl shrink-0">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14">
+                <a href="info.html" class="flex items-center space-x-2 text-zinc-400 hover:text-white transition-colors group">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+                    <span class="font-mono text-sm">cd ..</span>
+                </a>
+                <div class="flex items-center space-x-4 font-mono text-xs">
+                    <span class="flex items-center text-ide-accent"><i data-lucide="cpu" class="w-3 h-3 mr-1"></i> Running</span>
+                    <span class="text-zinc-500">floyd_warshall.c</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout (Split View) -->
+    <main class="flex-grow flex flex-col lg:flex-row overflow-hidden max-w-[1400px] mx-auto w-full">
+        
+        <!-- ==================== LEFT PANEL : COURS ==================== -->
+        <div class="w-full lg:w-5/12 p-4 lg:p-6 lg:overflow-y-auto border-b lg:border-b-0 lg:border-r border-white/5 custom-scrollbar">
+            
+            <div class="mb-6 flex items-center space-x-3">
+                <div class="p-2 bg-ide-accent/10 border border-ide-accent/20 rounded-lg">
+                    <i data-lucide="grid" class="w-5 h-5 text-ide-accentLight"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white tracking-tight">Floyd-Warshall</h1>
+                    <p class="text-xs font-mono text-zinc-500">Programmation Dynamique sur les Graphes</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-8 font-mono text-xs">
+                <span class="bg-ide-accent/10 text-ide-accentLight border border-ide-accent/20 px-2.5 py-1 rounded-full">Temps: $O(S^3)$</span>
+                <span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full">Espace: $O(S^2)$</span>
+            </div>
+
+            <!-- Principe -->
+            <section class="mb-8">
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center">
+                    <i data-lucide="book-open" class="w-4 h-4 mr-2 text-zinc-400"></i> Le Principe
+                </h2>
+                <div class="space-y-3 text-sm text-zinc-400 leading-relaxed">
+                    <p>
+                        L'algorithme de Floyd-Warshall permet de trouver les plus courts chemins entre <strong>toutes les paires de sommets</strong> d'un graphe (contrairement à Dijkstra qui part d'une source unique). Il a aussi l'avantage de fonctionner avec des poids négatifs !
+                    </p>
+                    <p>
+                        L'idée repose sur une construction progressive astucieuse (la programmation dynamique) :
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-zinc-300">
+                        <li><strong>Étape initiale :</strong> On relève les distances directes entre chaque sommet $i$ et $j$ via la matrice d'adjacence. Si aucune arête ne les relie, la distance est considérée comme infinie ($\infty$).</li>
+                        <li><strong>Étape itérative :</strong> Pour chaque sommet du graphe qu'on va appeler $k$ (de $0$ à $S-1$), on passe en revue toutes les paires de sommets $(i, j)$ et on se pose une question simple : <br>
+                        <em>"Est-il plus rapide d'aller de $i$ à $j$ en gardant le chemin actuel, ou en faisant un détour par $k$ ?"</em></li>
+                    </ul>
+                    <p class="mt-2 p-3 bg-white/5 border border-white/10 rounded-lg text-zinc-300">
+                        Si la distance de $i \rightarrow k$ additionnée à la distance de $k \rightarrow j$ est inférieure à la distance de $i \rightarrow j$ connue jusqu'à présent, on met à jour notre matrice des distances.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Code -->
+            <section class="mb-8">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center">
+                        <i data-lucide="code-2" class="w-4 h-4 mr-2 text-zinc-400"></i> Implémentation
+                    </h2>
+                    <div class="flex space-x-2 bg-white/5 p-1 rounded-lg border border-white/10 text-xs font-mono">
+                        <button id="tab-c" class="px-3 py-1 rounded bg-ide-accent/20 text-ide-accentLight transition-colors">C</button>
+                        <button id="tab-ocaml" class="px-3 py-1 rounded text-zinc-500 hover:text-zinc-300 transition-colors">OCaml</button>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-xl border border-white/5 overflow-hidden">
+                    <div class="flex items-center px-4 py-2 bg-white/5 border-b border-white/5">
+                        <div class="flex space-x-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                        </div>
+                        <span id="code-filename" class="ml-3 text-xs font-mono text-zinc-500">floyd_warshall.c</span>
+                    </div>
+                    
+                    <!-- Code C -->
+                    <pre id="code-block-c" class="p-4 text-xs font-mono text-zinc-300 overflow-x-auto custom-scrollbar code-block leading-relaxed">
+<span class="text-ide-keyword">void</span> <span class="text-ide-func">floyd_warshall</span>(<span class="text-ide-keyword">int</span> graph[V][V]) {
+    <span class="text-ide-keyword">int</span> dist[V][V];
+    
+    <span class="text-ide-comment">// 1. Initialisation</span>
+    <span class="text-ide-keyword">for</span> (<span class="text-ide-keyword">int</span> i = <span class="text-ide-accentLight">0</span>; i < V; i++)
+        <span class="text-ide-keyword">for</span> (<span class="text-ide-keyword">int</span> j = <span class="text-ide-accentLight">0</span>; j < V; j++)
+            dist[i][j] = graph[i][j];
+
+    <span class="text-ide-comment">// 2. Programmation Dynamique</span>
+    <span class="text-ide-keyword">for</span> (<span class="text-ide-keyword">int</span> k = <span class="text-ide-accentLight">0</span>; k < V; k++) {
+        <span class="text-ide-keyword">for</span> (<span class="text-ide-keyword">int</span> i = <span class="text-ide-accentLight">0</span>; i < V; i++) {
+            <span class="text-ide-keyword">for</span> (<span class="text-ide-keyword">int</span> j = <span class="text-ide-accentLight">0</span>; j < V; j++) {
+                <span class="text-ide-comment">// Si passer par k est plus court</span>
+                <span class="text-ide-keyword">if</span> (dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                }
+            }
+        }
+    }
+}</pre>
+
+                    <!-- Code OCaml (Caché par défaut) -->
+                    <pre id="code-block-ocaml" class="hidden p-4 text-xs font-mono text-zinc-300 overflow-x-auto custom-scrollbar code-block leading-relaxed">
+<span class="text-ide-keyword">let</span> <span class="text-ide-func">floyd_warshall</span> graph =
+  <span class="text-ide-keyword">let</span> v = <span class="text-ide-func">Array.length</span> graph <span class="text-ide-keyword">in</span>
+  <span class="text-ide-keyword">let</span> dist = <span class="text-ide-func">Array.make_matrix</span> v v <span class="text-ide-accentLight">0</span> <span class="text-ide-keyword">in</span>
+
+  <span class="text-ide-comment">(* 1. Initialisation *)</span>
+  <span class="text-ide-keyword">for</span> i = <span class="text-ide-accentLight">0</span> <span class="text-ide-keyword">to</span> v - <span class="text-ide-accentLight">1</span> <span class="text-ide-keyword">do</span>
+    <span class="text-ide-keyword">for</span> j = <span class="text-ide-accentLight">0</span> <span class="text-ide-keyword">to</span> v - <span class="text-ide-accentLight">1</span> <span class="text-ide-keyword">do</span>
+      dist.(i).(j) <- graph.(i).(j)
+    <span class="text-ide-keyword">done</span>
+  <span class="text-ide-keyword">done</span>;
+
+  <span class="text-ide-comment">(* 2. Programmation Dynamique *)</span>
+  <span class="text-ide-keyword">for</span> k = <span class="text-ide-accentLight">0</span> <span class="text-ide-keyword">to</span> v - <span class="text-ide-accentLight">1</span> <span class="text-ide-keyword">do</span>
+    <span class="text-ide-keyword">for</span> i = <span class="text-ide-accentLight">0</span> <span class="text-ide-keyword">to</span> v - <span class="text-ide-accentLight">1</span> <span class="text-ide-keyword">do</span>
+      <span class="text-ide-keyword">for</span> j = <span class="text-ide-accentLight">0</span> <span class="text-ide-keyword">to</span> v - <span class="text-ide-accentLight">1</span> <span class="text-ide-keyword">do</span>
+        <span class="text-ide-keyword">if</span> dist.(i).(k) + dist.(k).(j) < dist.(i).(j) <span class="text-ide-keyword">then</span>
+          dist.(i).(j) <- dist.(i).(k) + dist.(k).(j)
+      <span class="text-ide-keyword">done</span>
+    <span class="text-ide-keyword">done</span>
+  <span class="text-ide-keyword">done</span>;
+  dist
+</pre>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== RIGHT PANEL : LABORATOIRE ==================== -->
+        <div class="w-full lg:w-7/12 flex flex-col bg-[#050505] relative">
+            
+            <!-- Contrôles -->
+            <div class="p-4 border-b border-white/5 flex flex-wrap items-center justify-between gap-4 bg-black/40 z-10">
+                <div class="flex items-center space-x-2">
+                    <button id="btn-play" class="flex items-center justify-center w-10 h-10 rounded-lg bg-ide-accent/20 text-ide-accentLight hover:bg-ide-accent/40 transition-colors border border-ide-accent/30" title="Lecture/Pause">
+                        <i data-lucide="play" id="icon-play" class="w-5 h-5 ml-1"></i>
+                    </button>
+                    <button id="btn-step" class="flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 text-zinc-300 hover:bg-white/10 transition-colors border border-white/10" title="Étape suivante">
+                        <i data-lucide="step-forward" class="w-4 h-4"></i>
+                    </button>
+                    <button id="btn-reset" class="flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 text-zinc-300 hover:bg-white/10 transition-colors border border-white/10" title="Réinitialiser">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-3 text-xs font-mono">
+                    <i data-lucide="gauge" class="w-4 h-4 text-zinc-500"></i>
+                    <span class="text-zinc-400">Vitesse:</span>
+                    <input type="range" id="speed-slider" min="50" max="1000" value="400" class="w-24 accent-ide-accent" style="direction: rtl;">
+                </div>
+            </div>
+
+            <!-- Zone d'animation (Canvas + Matrice) -->
+            <div class="flex-grow flex flex-col lg:flex-row overflow-hidden p-4 gap-4">
+                
+                <!-- Graphe (Canvas) -->
+                <div class="w-full lg:w-1/2 flex flex-col">
+                    <div class="text-xs font-mono text-zinc-500 mb-2 uppercase tracking-wider flex justify-between">
+                        <span>Graphe_G(V, E)</span>
+                    </div>
+                    <div class="glass-panel rounded-xl border border-white/5 flex-grow relative overflow-hidden flex items-center justify-center min-h-[300px]">
+                        <canvas id="graph-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                    </div>
+                </div>
+
+                <!-- Matrice -->
+                <div class="w-full lg:w-1/2 flex flex-col">
+                    <div class="text-xs font-mono text-zinc-500 mb-2 uppercase tracking-wider">
+                        Matrice_Distances
+                    </div>
+                    <div class="glass-panel rounded-xl border border-white/5 flex-grow flex items-center justify-center p-4 min-h-[300px]">
+                        <div id="matrix-container" class="grid gap-1">
+                            <!-- Généré par JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Console Log Panel -->
+            <div class="h-24 md:h-32 border-t border-white/5 bg-[#0a0a0a] p-4 overflow-y-auto custom-scrollbar flex flex-col-reverse font-mono text-xs">
+                <div id="console-logs" class="flex flex-col space-y-1">
+                    <div class="text-zinc-500">> Système initialisé. Graphe généré.</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JS de l'animation -->
+    <script>
+        lucide.createIcons();
+
+        // -------------------------------------------------------------
+        // ETAT ET DONNÉES DU GRAPHE
+        // -------------------------------------------------------------
+        const INF = 999;
+        const NUM_NODES = 4;
+        
+        // Graphe initial (Matrice d'adjacence)
+        const initialGraph = [
+            [0, 3, INF, 7],
+            [8, 0, 2, INF],
+            [5, INF, 0, 1],
+            [2, INF, INF, 0]
+        ];
+
+        // Coordonnées esthétiques pour 4 noeuds
+        const nodePositions = [
+            { x: 0.2, y: 0.2 }, // Noeud 0: Haut Gauche
+            { x: 0.8, y: 0.2 }, // Noeud 1: Haut Droite
+            { x: 0.8, y: 0.8 }, // Noeud 2: Bas Droite
+            { x: 0.2, y: 0.8 }  // Noeud 3: Bas Gauche
+        ];
+
+        let dist = [];
+        
+        // Variables d'état de l'algorithme
+        let k = 0, i = 0, j = 0;
+        let isPlaying = false;
+        let animationId = null;
+        let isFinished = false;
+
+        // Éléments DOM
+        const canvas = document.getElementById('graph-canvas');
+        const ctx = canvas.getContext('2d');
+        const matrixContainer = document.getElementById('matrix-container');
+        const consoleLogs = document.getElementById('console-logs');
+        const btnPlay = document.getElementById('btn-play');
+        const iconPlay = document.getElementById('icon-play');
+        const btnStep = document.getElementById('btn-step');
+        const btnReset = document.getElementById('btn-reset');
+        const speedSlider = document.getElementById('speed-slider');
+
+        // -------------------------------------------------------------
+        // INITIALISATION
+        // -------------------------------------------------------------
+        function init() {
+            // Copie profonde du graphe initial
+            dist = initialGraph.map(row => [...row]);
+            k = 0; i = 0; j = 0;
+            isFinished = false;
+            
+            buildMatrixDOM();
+            resizeCanvas();
+            drawGraph();
+            updateMatrixHighlight();
+            log("> Initialisation de la matrice des distances.", "text-zinc-500");
+        }
+
+        function log(msg, colorClass = "text-zinc-400") {
+            const div = document.createElement('div');
+            div.className = colorClass;
+            div.textContent = msg;
+            consoleLogs.appendChild(div);
+            consoleLogs.parentElement.scrollTop = consoleLogs.parentElement.scrollHeight;
+        }
+
+        // -------------------------------------------------------------
+        // DESSIN DU GRAPHE (CANVAS)
+        // -------------------------------------------------------------
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        window.addEventListener('resize', () => { resizeCanvas(); drawGraph(); });
+
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width;
+            const h = canvas.height;
+            const radius = 20;
+
+            // Dessiner les arêtes fixes (grises)
+            for (let u = 0; u < NUM_NODES; u++) {
+                for (let v = 0; v < NUM_NODES; v++) {
+                    if (u !== v && initialGraph[u][v] !== INF) {
+                        drawArrow(u, v, initialGraph[u][v], "#3f3f46", 1, false);
+                    }
+                }
+            }
+
+            // Mettre en évidence les arêtes actives selon l'état actuel (si non terminé)
+            if (!isFinished) {
+                // Arête i -> j (Actuelle à comparer)
+                if (i !== j) drawArrow(i, j, dist[i][j], "#52525b", 2, true, 0); 
+                
+                // Arête i -> k et k -> j (Le détour)
+                if (i !== k && dist[i][k] !== INF) drawArrow(i, k, dist[i][k], "#3b82f6", 2, true, -15); // Blue
+                if (k !== j && dist[k][j] !== INF) drawArrow(k, j, dist[k][j], "#ec4899", 2, true, 15); // Pink
+            }
+
+            // Dessiner les noeuds
+            for (let n = 0; n < NUM_NODES; n++) {
+                const nx = nodePositions[n].x * w;
+                const ny = nodePositions[n].y * h;
+                
+                ctx.beginPath();
+                ctx.arc(nx, ny, radius, 0, Math.PI * 2);
+                
+                // Couleurs conditionnelles
+                if (!isFinished && n === k) {
+                    ctx.fillStyle = "#a855f7"; ctx.strokeStyle = "#d8b4fe"; ctx.lineWidth = 3; // Purple (Intermédiaire)
+                } else if (!isFinished && n === i) {
+                    ctx.fillStyle = "#3b82f6"; ctx.strokeStyle = "#93c5fd"; ctx.lineWidth = 3; // Blue (Source)
+                } else if (!isFinished && n === j) {
+                    ctx.fillStyle = "#ec4899"; ctx.strokeStyle = "#f9a8d4"; ctx.lineWidth = 3; // Pink (Destination)
+                } else {
+                    ctx.fillStyle = "#18181b"; ctx.strokeStyle = "#3f3f46"; ctx.lineWidth = 2; // Default
+                }
+                
+                ctx.fill();
+                ctx.stroke();
+
+                // Texte du noeud
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 14px 'Fira Code'";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(n, nx, ny);
+            }
+        }
+
+        // Fonction utilitaire pour dessiner les flèches courbées
+        function drawArrow(from, to, weight, color, width, highlight, offsetCurve = 0) {
+            const w = canvas.width; const h = canvas.height;
+            const x1 = nodePositions[from].x * w; const y1 = nodePositions[from].y * h;
+            const x2 = nodePositions[to].x * w; const y2 = nodePositions[to].y * h;
+            
+            // Calcul angle
+            const dx = x2 - x1; const dy = y2 - y1;
+            const angle = Math.atan2(dy, dx);
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            
+            // Ajustement pour ne pas dessiner DANS le noeud
+            const radius = 20;
+            const startX = x1 + Math.cos(angle) * radius;
+            const startY = y1 + Math.sin(angle) * radius;
+            const endX = x2 - Math.cos(angle) * radius;
+            const endY = y2 - Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+
+            // Courber la ligne si c'est un aller-retour ou sur demande
+            let cx = (startX + endX) / 2;
+            let cy = (startY + endY) / 2;
+            
+            // Éloigner le point de contrôle pour courber
+            const curveFactor = 40 + offsetCurve;
+            cx -= Math.sin(angle) * curveFactor;
+            cy += Math.cos(angle) * curveFactor;
+
+            ctx.moveTo(startX, startY);
+            ctx.quadraticCurveTo(cx, cy, endX, endY);
+            ctx.stroke();
+
+            // Flèche
+            const arrowAngle = Math.atan2(endY - cy, endX - cx);
+            ctx.beginPath();
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX - 10 * Math.cos(arrowAngle - Math.PI/6), endY - 10 * Math.sin(arrowAngle - Math.PI/6));
+            ctx.lineTo(endX - 10 * Math.cos(arrowAngle + Math.PI/6), endY - 10 * Math.sin(arrowAngle + Math.PI/6));
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            // Texte (Poids)
+            if (highlight || weight !== INF) {
+                const text = weight === INF ? "∞" : weight;
+                ctx.fillStyle = highlight ? "#ffffff" : "#a1a1aa";
+                ctx.font = highlight ? "bold 14px 'Fira Code'" : "12px 'Fira Code'";
+                
+                // Fond pour le texte
+                const tx = (startX + 2*cx + endX)/4;
+                const ty = (startY + 2*cy + endY)/4;
+                
+                if (highlight) {
+                    ctx.fillStyle = "rgba(0,0,0,0.8)";
+                    ctx.fillRect(tx-10, ty-10, 20, 20);
+                    ctx.fillStyle = color;
+                }
+                
+                ctx.fillText(text, tx, ty);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // MATRICE DOM
+        // -------------------------------------------------------------
+        function buildMatrixDOM() {
+            matrixContainer.innerHTML = '';
+            // Grille de (NUM_NODES + 1) x (NUM_NODES + 1)
+            matrixContainer.style.gridTemplateColumns = `repeat(${NUM_NODES + 1}, minmax(0, 1fr))`;
+            
+            // Coin vide
+            matrixContainer.appendChild(createCell('', 'border-transparent font-bold text-zinc-500'));
+            
+            // En-têtes Colonnes
+            for (let col = 0; col < NUM_NODES; col++) {
+                matrixContainer.appendChild(createCell(`j=${col}`, 'border-b border-white/10 text-ide-pink font-bold pb-2'));
+            }
+
+            // Lignes
+            for (let row = 0; row < NUM_NODES; row++) {
+                // En-tête Ligne
+                matrixContainer.appendChild(createCell(`i=${row}`, 'border-r border-white/10 text-ide-blue font-bold pr-2 text-right'));
+                
+                for (let col = 0; col < NUM_NODES; col++) {
+                    const val = dist[row][col] === INF ? '∞' : dist[row][col];
+                    const id = `cell-${row}-${col}`;
+                    matrixContainer.appendChild(createCell(val, 'border border-white/5 bg-white/5 text-zinc-300 font-mono', id));
+                }
+            }
+        }
+
+        function createCell(text, extraClasses, id = null) {
+            const div = document.createElement('div');
+            div.className = `flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded ${extraClasses} matrix-cell text-sm sm:text-base`;
+            div.textContent = text;
+            if (id) div.id = id;
+            return div;
+        }
+
+        function updateMatrixHighlight() {
+            // Nettoyer tous les highlights
+            for (let r = 0; r < NUM_NODES; r++) {
+                for (let c = 0; c < NUM_NODES; c++) {
+                    const el = document.getElementById(`cell-${r}-${c}`);
+                    if (!el) continue;
+                    el.className = 'flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded border border-white/5 bg-white/5 text-zinc-300 font-mono matrix-cell text-sm sm:text-base';
+                    el.textContent = dist[r][c] === INF ? '∞' : dist[r][c];
+                }
+            }
+
+            if (isFinished) return;
+
+            // Highlight k row and column
+            for (let n = 0; n < NUM_NODES; n++) {
+                document.getElementById(`cell-${k}-${n}`).classList.add('cell-highlight-k');
+                document.getElementById(`cell-${n}-${k}`).classList.add('cell-highlight-k');
+            }
+
+            // Highlight specific elements being compared
+            document.getElementById(`cell-${i}-${j}`).classList.add('cell-highlight-j'); // The target
+            document.getElementById(`cell-${i}-${k}`).classList.add('cell-highlight-i'); // part 1
+            document.getElementById(`cell-${k}-${j}`).classList.add('cell-highlight-i'); // part 2
+        }
+
+        function animateMatrixUpdate(r, c, newVal) {
+            const el = document.getElementById(`cell-${r}-${c}`);
+            el.textContent = newVal;
+            el.classList.add('cell-updated');
+            setTimeout(() => {
+                el.classList.remove('cell-updated');
+            }, speedSlider.value * 0.8);
+        }
+
+        // -------------------------------------------------------------
+        // LOGIQUE FLOYD WARSHALL (Machine à états)
+        // -------------------------------------------------------------
+        function stepAlgorithm() {
+            if (isFinished) return;
+
+            const oldDist = dist[i][j];
+            const sum = (dist[i][k] === INF || dist[k][j] === INF) ? INF : dist[i][k] + dist[k][j];
+
+            updateMatrixHighlight();
+            drawGraph();
+
+            if (sum < oldDist) {
+                dist[i][j] = sum;
+                log(`[k=${k}] dist[${i}][${j}] = ${sum} (via ${k} plus court que ${oldDist === INF ? '∞' : oldDist})`, 'text-ide-green font-bold');
+                animateMatrixUpdate(i, j, sum);
+            } else if (i !== j && i !== k && j !== k) {
+                const sStr = sum === INF ? '∞' : sum;
+                const oStr = oldDist === INF ? '∞' : oldDist;
+                // log(`[k=${k}] i=${i}, j=${j} | ${oStr} <= ${sStr} (pas de modif)`, 'text-zinc-600');
+            }
+
+            // Avancer les index
+            j++;
+            if (j >= NUM_NODES) {
+                j = 0;
+                i++;
+                if (i >= NUM_NODES) {
+                    i = 0;
+                    k++;
+                    log(`--- Étape k=${k} terminée ---`, 'text-ide-accentLight my-1');
+                    if (k >= NUM_NODES) {
+                        isFinished = true;
+                        pause();
+                        updateMatrixHighlight();
+                        drawGraph();
+                        log("> Algorithme terminé. Matrice des plus courts chemins calculée.", "text-ide-accent font-bold mt-2");
+                    }
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // CONTRÔLES
+        // -------------------------------------------------------------
+        function loop() {
+            if (isPlaying && !isFinished) {
+                stepAlgorithm();
+                animationId = setTimeout(loop, speedSlider.value);
+            }
+        }
+
+        function play() {
+            if (isFinished) return;
+            isPlaying = true;
+            iconPlay.setAttribute('data-lucide', 'pause');
+            lucide.createIcons();
+            loop();
+        }
+
+        function pause() {
+            isPlaying = false;
+            iconPlay.setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+            clearTimeout(animationId);
+        }
+
+        btnPlay.addEventListener('click', () => {
+            if (isPlaying) pause();
+            else play();
+        });
+
+        btnStep.addEventListener('click', () => {
+            pause();
+            stepAlgorithm();
+        });
+
+        btnReset.addEventListener('click', () => {
+            pause();
+            init();
+        });
+
+        // -------------------------------------------------------------
+        // ONGLET CODE (C / OCaml)
+        // -------------------------------------------------------------
+        const tabC = document.getElementById('tab-c');
+        const tabOcaml = document.getElementById('tab-ocaml');
+        const blockC = document.getElementById('code-block-c');
+        const blockOcaml = document.getElementById('code-block-ocaml');
+        const codeFilename = document.getElementById('code-filename');
+
+        tabC.addEventListener('click', () => {
+            tabC.className = "px-3 py-1 rounded bg-ide-accent/20 text-ide-accentLight transition-colors";
+            tabOcaml.className = "px-3 py-1 rounded text-zinc-500 hover:text-zinc-300 transition-colors";
+            blockC.classList.remove('hidden');
+            blockOcaml.classList.add('hidden');
+            codeFilename.textContent = "floyd_warshall.c";
+        });
+
+        tabOcaml.addEventListener('click', () => {
+            tabOcaml.className = "px-3 py-1 rounded bg-ide-accent/20 text-ide-accentLight transition-colors";
+            tabC.className = "px-3 py-1 rounded text-zinc-500 hover:text-zinc-300 transition-colors";
+            blockOcaml.classList.remove('hidden');
+            blockC.classList.add('hidden');
+            codeFilename.textContent = "floyd_warshall.ml";
+        });
+
+        // Initialiser KaTeX une fois que le document est prêt
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+
+        // Démarrage
+        init();
+
+    </script>
+</body>
+</html>
