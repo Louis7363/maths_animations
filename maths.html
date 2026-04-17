@@ -1,348 +1,404 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animations Mathématiques</title>
+    <title>Mathématiques - Portail Interactif MP2I</title>
+    <meta name="description" content="Galerie des animations interactives de Mathématiques pour la CPGE MP2I.">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; overflow-x: hidden; }
-        
-        /* Animations d'entrée pour les cartes */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .card-animate {
-            opacity: 0;
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-        
-        /* Style du fond mathématique */
-        #math-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        
-        .content-wrapper { position: relative; z-index: 10; }
-    </style>
-</head>
-<body class="text-slate-800 min-h-screen">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
-    <!-- Fond animé mathématique -->
-    <canvas id="math-bg"></canvas>
-
-    <div class="content-wrapper">
-        <!-- En-tête du site -->
-        <header class="bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200 sticky top-0 z-50 transition-all duration-300">
-            <div class="max-w-6xl mx-auto px-6 py-6">
-                <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight flex items-center">
-                    <!-- Icône mathématique -->
-                    <svg class="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    Animations Mathématiques
-                </h1>
-                <p class="text-slate-500 mt-2 text-lg font-medium">Visualisation interactive et intuitive de concepts mathématiques.</p>
-            </div>
-        </header>
-
-        <!-- Contenu principal -->
-        <main class="max-w-6xl mx-auto px-6 py-10">
-            
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-xl font-semibold text-slate-700">Catalogue complet des animations</h2>
-            </div>
-            
-            <!-- Grille pour les différentes animations -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                
-                <!-- 1. SEA vs SEV -->
-                <a href="sea.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-blue-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Espace Affine / Vectoriel</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Comprendre visuellement la différence entre une direction (SEV) et une position (SEA).
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 2. Fonctions Usuelles -->
-                <a href="fonctions_usuelles.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-pink-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-pink-50 text-pink-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-pink-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12c3-6 6-6 9 0s6 6 9 0"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Fonctions Usuelles</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Traceur interactif pour trigonométrie et fonctions hyperboliques.
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 3. Développements Limités -->
-                <a href="dl.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-red-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Développements Limités</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Approximation polynomiale (Maclaurin) d'une fonction au voisinage de 0.
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 4. Taux d'Accroissement -->
-                <a href="taux_accroissement.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-purple-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Taux d'Accroissement</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Observez la sécante se transformer en tangente lorsque h tend vers 0.
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 5. Inégalité de Jensen -->
-                <a href="inegalite_jensen.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-amber-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Inégalité de Jensen</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Visualiser la corde au-dessus de la courbe pour une fonction convexe.
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 6. Théorème des 3 pentes -->
-                <a href="th_des_3_pentes.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-indigo-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Lemme des 3 Pentes</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Croissance des pentes des sécantes sur une courbe convexe.
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 7. Suites Adjacentes -->
-                <a href="th_des_suites_adjacentes.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-emerald-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Suites Adjacentes</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            L'entonnoir de convergence commune pour deux suites (croissante/décroissante).
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 8. Sommes Télescopiques -->
-                <a href="telescopique.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-orange-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Sommes Télescopiques</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Animation algébrique de l'annulation en chaîne des termes d'une somme.
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 9. Cercle Trigonométrique -->
-                <a href="cercle_trigo.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-cyan-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-cyan-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Cercle Trigonométrique</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Exploration interactive de cos, sin et tan sur le cercle unité.
-                        </p>
-                    </div>
-                </a>
-
-                <!-- 10. Injectivité / Surjectivité -->
-                <a href="inj_surj_bij.html" class="block group">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-full transition-all duration-300 hover:shadow-md hover:border-violet-400 hover:-translate-y-1 flex flex-col">
-                        <div class="w-10 h-10 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-violet-600 group-hover:text-white transition-colors duration-300">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <h3 class="text-md font-bold text-slate-800 mb-2">Applications (Inj/Surj)</h3>
-                        <p class="text-slate-600 text-xs mb-4 flex-grow">
-                            Reliez les éléments avec des flèches pour comprendre l'injectivité et la bijectivité.
-                        </p>
-                    </div>
-                </a>
-
-            </div>
-
-            <!-- NOUVELLE SECTION : Contact / Suggestion -->
-            <section class="mt-20 relative overflow-hidden bg-gradient-to-br from-indigo-900 to-slate-800 rounded-3xl shadow-xl border border-indigo-700 p-10 text-center">
-                <!-- Décoration de fond (halo lumineux) -->
-                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-indigo-500 opacity-20 blur-3xl"></div>
-                <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-blue-500 opacity-20 blur-3xl"></div>
-                
-                <div class="relative z-10">
-                    <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-md border border-white/20">
-                        <svg class="w-8 h-8 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h2 class="text-3xl font-bold text-white mb-4">Une idée de nouvelle animation ?</h2>
-                    <p class="text-indigo-200 mb-8 max-w-2xl mx-auto text-lg">
-                        Vous avez du mal à visualiser un concept mathématique spécifique ? Vous aimeriez le voir ajouté à ce catalogue interactif ? N'hésitez pas à m'en faire part !
-                    </p>
-                    
-                    <!-- Le lien mailto lance automatiquement l'application mail avec l'adresse et le sujet -->
-                    <a href="mailto:louisprogrammation@proton.me?subject=Suggestion%20d'animation%20mathématique" 
-                       class="inline-flex items-center px-8 py-4 bg-white text-indigo-900 font-bold rounded-xl shadow-lg hover:bg-indigo-50 hover:scale-105 hover:shadow-indigo-500/30 transition-all duration-300 group">
-                        <svg class="w-5 h-5 mr-3 text-indigo-600 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                        Envoyer une suggestion
-                    </a>
-                    
-                    <p class="mt-6 text-indigo-300/60 text-sm font-medium">ou par e-mail : <span class="text-indigo-200">louisprogrammation@proton.me</span></p>
-                </div>
-            </section>
-
-        </main>
-
-        <!-- Pied de page -->
-        <footer class="mt-8 py-8 text-center border-t border-slate-200 bg-white/80 backdrop-blur-sm relative z-10">
-            <p class="text-slate-500 font-medium">Créé pour mieux comprendre les maths !</p>
-            <p class="text-slate-400 text-sm mt-2">© Animations Mathématiques Interactives</p>
-        </footer>
-    </div>
-
-    <!-- SCRIPT GÉRANT LES ANIMATIONS -->
     <script>
-        // 1. Appliquer les animations d'entrée aux cartes avec un délai progressif
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.grid > a');
-            cards.forEach((card, index) => {
-                card.classList.add('card-animate');
-                card.style.animationDelay = `${index * 0.08}s`; // Décalage de 0.08s par carte
-                
-                // Rendre les cartes légèrement translucides pour voir le canvas bouger derrière
-                const innerDiv = card.querySelector('div.bg-white');
-                if(innerDiv) {
-                    innerDiv.classList.remove('bg-white');
-                    innerDiv.classList.add('bg-white/85', 'backdrop-blur-sm');
-                }
-            });
-        });
-
-        // 2. Animation du fond : Constellation de symboles mathématiques
-        const canvas = document.getElementById('math-bg');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height;
-        let particles = [];
-        // Tableau des symboles qui vont flotter en fond
-        const symbols = ['∫', '∑', 'π', '∞', '≈', '∆', 'θ', 'λ', 'μ', 'σ', 'e', 'x', 'y', 'f(x)', '∈'];
-        
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.4;
-                this.vy = (Math.random() - 0.5) * 0.4;
-                this.size = Math.random() * 2 + 1;
-                this.isSymbol = Math.random() > 0.75; // 25% de chance d'être un symbole au lieu d'un point
-                this.symbol = symbols[Math.floor(Math.random() * symbols.length)];
-                this.alpha = Math.random() * 0.5 + 0.1;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Rebondissement fluide sur les bords de l'écran
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-            }
-
-            draw() {
-                ctx.globalAlpha = this.alpha;
-                if (this.isSymbol) {
-                    ctx.fillStyle = '#64748b';
-                    ctx.font = `${this.size * 8}px 'Times New Roman', serif`;
-                    ctx.fillText(this.symbol, this.x, this.y);
-                } else {
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            // Densité qui s'adapte à la taille de l'écran
-            const numParticles = Math.floor((width * height) / 22000); 
-            for (let i = 0; i < numParticles; i++) {
-                particles.push(new Particle());
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            // Mise à jour et dessin
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-
-            // Dessiner des liens (graphe) entre les particules proches
-            ctx.lineWidth = 0.5;
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 130) {
-                        const opacity = 1 - (distance / 130);
-                        ctx.strokeStyle = `rgba(148, 163, 184, ${opacity * 0.25})`;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        dark: '#0f172a',
+                        darker: '#020617',
                     }
                 }
             }
-            requestAnimationFrame(animate);
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .filter-btn.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            border-color: #3b82f6;
         }
 
-        window.addEventListener('resize', () => {
-            resize();
-            initParticles(); // Recalculer la densité selon la nouvelle taille
+        /* Subtile animation pour les cartes */
+        .animation-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s ease;
+        }
+        .animation-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-darker text-slate-200 font-sans antialiased overflow-x-hidden selection:bg-blue-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-card border-b border-slate-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center space-x-2 group">
+                    <i data-lucide="arrow-left" class="text-slate-400 group-hover:text-blue-400 transition-colors w-5 h-5"></i>
+                    <span class="font-medium text-slate-300 group-hover:text-white transition-colors">Retour à l'accueil</span>
+                </a>
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="sigma" class="text-blue-500 w-6 h-6"></i>
+                    <span class="font-bold text-lg tracking-tight text-white">Galerie <span class="text-blue-500">Maths</span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="pt-32 pb-12 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                Animations de <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Mathématiques</span>
+            </h1>
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+                Visualisez les concepts fondamentaux du programme d'analyse et d'algèbre.
+            </p>
+
+            <!-- Search Bar -->
+            <div class="max-w-xl mx-auto relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="Rechercher une animation (ex: Taylor, Fourier...)" 
+                       class="w-full bg-slate-900/80 border border-slate-700 text-slate-200 text-sm rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block pl-11 p-3 transition-all placeholder-slate-500 backdrop-blur-sm">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content: Filters & Gallery -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 relative z-10">
+        
+        <!-- Filters -->
+        <div class="flex flex-wrap justify-center gap-3 mb-10" id="filter-container">
+            <button class="filter-btn active px-5 py-2 rounded-full border border-slate-700 text-sm font-medium text-slate-300 hover:border-slate-500 transition-all" data-filter="all">Tout voir</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-700 text-sm font-medium text-slate-300 hover:border-slate-500 transition-all" data-filter="algebre">Algèbre</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-700 text-sm font-medium text-slate-300 hover:border-slate-500 transition-all" data-filter="analyse">Analyse</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-700 text-sm font-medium text-slate-300 hover:border-slate-500 transition-all" data-filter="geometrie">Géométrie</button>
+            <button class="filter-btn px-5 py-2 rounded-full border border-slate-700 text-sm font-medium text-slate-300 hover:border-slate-500 transition-all" data-filter="logique">Ensembles & Logique</button>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery">
+            
+            <!-- Espace Affine / Vectoriel -->
+            <a href="sea.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="algebre">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="axis-3d" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Algèbre</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Espace Affine / Vectoriel</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Comprendre visuellement la différence entre une direction (SEV) et une position (SEA).
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Fonctions Usuelles -->
+            <a href="fonctions_usuelles.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="analyse">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="line-chart" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Analyse</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Fonctions Usuelles</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Traceur interactif pour trigonométrie et fonctions hyperboliques.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Développements Limités -->
+            <a href="dl.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="analyse">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="trending-up" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Analyse</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Développements Limités</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Approximation polynomiale (Maclaurin) d'une fonction au voisinage de 0.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Taux d'Accroissement -->
+            <a href="taux_accroissement.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="analyse">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="move-diagonal-2" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Analyse</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Taux d'Accroissement</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Observez la sécante se transformer en tangente lorsque h tend vers 0.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Inégalité de Jensen -->
+            <a href="inegalite_jensen.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="analyse">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="smile" class="w-6 h-6 transform rotate-180"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Analyse</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Inégalité de Jensen</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Visualiser la corde au-dessus de la courbe pour une fonction convexe.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Lemme des 3 Pentes -->
+            <a href="th_des_3_pentes.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="analyse">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Analyse</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Lemme des 3 Pentes</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Croissance des pentes des sécantes sur une courbe convexe.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Suites Adjacentes -->
+            <a href="th_des_suites_adjacentes.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="analyse">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="arrow-right-left" class="w-6 h-6 transform rotate-90"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Analyse</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Suites Adjacentes</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        L'entonnoir de convergence commune pour deux suites (croissante/décroissante).
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Sommes Télescopiques -->
+            <a href="telescopique.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="algebre">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="sigma" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Algèbre</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Sommes Télescopiques</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Animation algébrique de l'annulation en chaîne des termes d'une somme.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cercle Trigonométrique -->
+            <a href="cercle_trigo.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="geometrie">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="circle-dashed" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Géométrie</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Cercle Trigonométrique</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Exploration interactive de cos, sin et tan sur le cercle unité.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Applications (Inj/Surj) -->
+            <a href="inj_surj_bij.html" class="animation-card group relative bg-slate-800/60 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 flex flex-col" data-category="logique">
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="split" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 text-slate-400 rounded border border-slate-700">Ensembles</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors search-target">Applications (Inj/Surj)</h3>
+                    <p class="text-slate-400 text-sm mb-6 flex-grow search-target">
+                        Reliez les éléments avec des flèches pour comprendre l'injectivité et la bijectivité.
+                    </p>
+                    <div class="text-sm font-medium text-blue-400 flex items-center opacity-80 group-hover:opacity-100 transition-opacity">
+                        Ouvrir l'animation <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Message si aucun résultat -->
+        <div id="no-results" class="hidden text-center py-16">
+            <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-500">
+                <i data-lucide="search-x" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-medium text-white mb-2">Aucun résultat</h3>
+            <p class="text-slate-400">Aucune animation ne correspond à votre recherche ou au filtre sélectionné.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-darker py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                <i data-lucide="sigma" class="text-slate-600 w-5 h-5"></i>
+                <span class="text-slate-500 font-medium">Portail Interactif MP2I - Mathématiques</span>
+            </div>
+            <p class="text-slate-500 text-sm text-center">
+                © <span id="year"></span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Initialisation Lucide Icons
+        lucide.createIcons();
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Système de filtrage et de recherche
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.animation-card');
+        const searchInput = document.getElementById('search-input');
+        const noResults = document.getElementById('no-results');
+
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        function updateGallery() {
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                
+                // Concaténer le texte des éléments ayant la classe 'search-target'
+                const searchableText = Array.from(card.querySelectorAll('.search-target'))
+                                            .map(el => el.textContent.toLowerCase())
+                                            .join(' ');
+                
+                const matchesFilter = currentFilter === 'all' || category === currentFilter;
+                const matchesSearch = searchableText.includes(currentSearch.toLowerCase());
+
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = 'flex';
+                    // Effet d'apparition douce
+                    setTimeout(() => { card.style.opacity = '1'; }, 10);
+                    visibleCount++;
+                } else {
+                    card.style.opacity = '0';
+                    setTimeout(() => { 
+                        if(card.style.opacity === '0') card.style.display = 'none'; 
+                    }, 300); // Wait for fade out
+                }
+            });
+
+            // Gérer le message "Aucun résultat"
+            setTimeout(() => {
+                if (visibleCount === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                }
+            }, 300);
+        }
+
+        // Écouteur pour les boutons de filtre
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active', 'bg-blue-500', 'text-white', 'border-blue-500'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                updateGallery();
+            });
         });
 
-        // Démarrage de l'animation de fond
-        resize();
-        initParticles();
-        animate();
+        // Écouteur pour la barre de recherche
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            updateGallery();
+        });
     </script>
 </body>
 </html>
