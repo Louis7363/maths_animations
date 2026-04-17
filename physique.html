@@ -1,285 +1,245 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physique MP2I - Animations</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts (Fira Code pour le style labo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        lab: {
+                            bg: '#050505',
+                            card: '#0a0a0a',
+                            border: '#1a1a1a',
+                            text: '#a3a3a3',
+                            accent: '#10b981', // Vert émeraude façon terminal
+                            glow: 'rgba(16, 185, 129, 0.15)'
+                        }
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #0f172a; /* slate-900 */ overflow-x: hidden; }
-        
-        /* Animations d'entrée pour les cartes */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .card-animate {
-            opacity: 0;
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: #050505;
+            color: #a3a3a3;
         }
 
-        /* Effets Glow pour les bordures au survol */
-        .glow-cyan-hover:hover { box-shadow: 0 0 25px rgba(6, 182, 212, 0.25); }
-        .glow-amber-hover:hover { box-shadow: 0 0 25px rgba(245, 158, 11, 0.25); }
-        .glow-pink-hover:hover { box-shadow: 0 0 25px rgba(236, 72, 153, 0.25); }
-        .glow-indigo-hover:hover { box-shadow: 0 0 25px rgba(99, 102, 241, 0.25); }
-        
-        /* Style du fond ondes */
-        #wave-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.6;
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
+        /* Effet "Glow" labo au survol des cartes */
+        .lab-card {
+            transition: all 0.3s ease;
+            border: 1px solid #1a1a1a;
         }
-        
-        .content-wrapper { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh;}
+        .lab-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Animation du curseur clignotant */
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
     </style>
 </head>
-<body class="text-slate-300 selection:bg-cyan-500/30 selection:text-cyan-200">
+<body class="selection:bg-lab-accent selection:text-black min-h-screen flex flex-col">
 
-    <!-- Fond animé Champ d'Ondes -->
-    <canvas id="wave-bg"></canvas>
-
-    <div class="content-wrapper">
-        <!-- En-tête du site -->
-        <header class="bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-800 sticky top-0 z-50 transition-all duration-300">
-            <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
-                <div class="flex items-center">
-                    <a href="index.html" class="mr-6 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    </a>
-                    <div>
-                        <h1 class="text-2xl font-bold text-white tracking-tight flex items-center">
-                            <svg class="w-7 h-7 mr-3 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.017 18L14.017 21.369 9.983 21.369 9.983 18 2.222 13.515 3.93 10.559 10 14.062 10 7.058 6.002 4.752 7.712 1.795 12 4.27 16.288 1.795 17.998 4.752 14 7.058 14 14.062 20.07 10.559 21.778 13.515 14.017 18zM12 11.5c-1.381 0-2.5 1.119-2.5 2.5s1.119 2.5 2.5 2.5 2.5-1.119 2.5-2.5-1.119-2.5-2.5-2.5z"></path></svg>
-                            Laboratoire de Physique
-                        </h1>
-                    </div>
-                </div>
-                <div class="hidden md:flex text-sm font-medium text-slate-500 items-center">
-                    <span class="w-2 h-2 rounded-full bg-cyan-500 mr-2 animate-pulse"></span>
-                    Simulation Engine V1.0
+    <!-- Navigation minimaliste -->
+    <nav class="border-b border-lab-border bg-lab-bg/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center space-x-2 text-lab-text hover:text-lab-accent transition-colors">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    <span class="text-sm">Retour_Portail</span>
+                </a>
+                <div class="flex items-center space-x-2 text-lab-accent">
+                    <i data-lucide="radio" class="w-5 h-5 animate-pulse"></i>
+                    <span class="text-sm font-bold">STATUS: ONLINE</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </nav>
 
-        <!-- Contenu principal -->
-        <main class="max-w-6xl mx-auto px-6 py-12 flex-grow">
-            
-            <div class="mb-12 border-l-4 border-cyan-500 pl-6 py-2">
-                <h2 class="text-3xl font-bold text-white mb-2">Mécanique, Ondes & Électrocinétique</h2>
-                <p class="text-lg text-slate-400">Expérimentez les lois de la physique à travers des simulations interactives. Modifiez les conditions initiales et observez l'évolution des systèmes.</p>
-            </div>
-            
-            <!-- Grille des animations Physique -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Header Labo -->
+    <header class="py-16 border-b border-lab-border relative overflow-hidden">
+        <!-- Grille de fond subtile -->
+        <div class="absolute inset-0" style="background-image: radial-gradient(#1a1a1a 1px, transparent 1px); background-size: 24px 24px;"></div>
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">
+                        > Laboratoire_de_Physique<span class="text-lab-accent cursor-blink">_</span>
+                    </h1>
+                    <p class="text-lab-text text-sm">
+                        Simulation Engine V1.0 // MP2I
+                    </p>
+                </div>
                 
-                <!-- 1. Oscillateur Harmonique -->
-                <a href="oscillateur.html" class="block group card-animate" style="animation-delay: 0.1s;">
-                    <div class="bg-slate-800/80 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-cyan-hover hover:-translate-y-1 hover:border-cyan-500/50 relative overflow-hidden flex flex-col">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-cyan-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-slate-900 border border-slate-700 text-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-slate-800 transition-colors duration-300 z-10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </div>
-                            <span class="text-xs font-semibold text-cyan-200 bg-cyan-900/50 px-2 py-1 rounded border border-cyan-800/50">Mécanique</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-white mb-2 z-10">Oscillateur Harmonique</h3>
-                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
-                            Étude du système masse-ressort. Perturbez le système pour visualiser les portraits de phase et l'amortissement.
-                        </p>
-                        
-                        <div class="text-xs text-cyan-500 group-hover:text-cyan-400 transition-colors mt-auto z-10 flex items-center font-medium">
-                            Lancer l'expérience →
-                        </div>
+                <!-- Search Bar Façon Terminal -->
+                <div class="mt-8 md:mt-0 w-full md:w-80 relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-lab-accent text-sm">></span>
                     </div>
-                </a>
-
-                <!-- 2. Optique Géométrique -->
-                <a href="lentilles.html" class="block group card-animate" style="animation-delay: 0.2s;">
-                    <div class="bg-slate-800/80 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-amber-hover hover:-translate-y-1 hover:border-amber-500/50 relative overflow-hidden flex flex-col">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-slate-900 border border-slate-700 text-amber-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-slate-800 transition-colors duration-300 z-10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                            </div>
-                            <span class="text-xs font-semibold text-amber-200 bg-amber-900/50 px-2 py-1 rounded border border-amber-800/50">Optique</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-white mb-2 z-10">Lentilles Minces</h3>
-                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
-                            Tracé des rayons lumineux (convergents/divergents). Construction de l'image réelle ou virtuelle d'un objet.
-                        </p>
-                        
-                        <div class="text-xs text-amber-500 group-hover:text-amber-400 transition-colors mt-auto z-10 flex items-center font-medium">
-                            Lancer l'expérience →
-                        </div>
-                    </div>
-                </a>
-
-                <!-- 3. Circuits RLC (Prochainement) -->
-                <a href="#" class="block group card-animate" style="animation-delay: 0.3s;">
-                    <div class="bg-slate-800/80 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-pink-hover hover:-translate-y-1 hover:border-pink-500/50 relative overflow-hidden flex flex-col">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-slate-900 border border-slate-700 text-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-slate-800 transition-colors duration-300 z-10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            </div>
-                            <span class="text-xs font-semibold text-pink-200 bg-pink-900/50 px-2 py-1 rounded border border-pink-800/50">Électrocinétique</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-white mb-2 z-10">Régime Transitoire RLC</h3>
-                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
-                            Charge et décharge d'un condensateur. Observez les régimes apériodique, critique et pseudo-périodique.
-                        </p>
-                        
-                        <div class="text-xs text-slate-500 group-hover:text-pink-400 transition-colors mt-auto z-10 flex items-center font-medium">
-                            Construire l'expérience →
-                        </div>
-                    </div>
-                </a>
-
-                <!-- 4. Fentes d'Young (Prochainement) -->
-                <a href="#" class="block group card-animate" style="animation-delay: 0.4s;">
-                    <div class="bg-slate-800/80 border border-slate-700 p-6 rounded-2xl h-full transition-all duration-300 glow-indigo-hover hover:-translate-y-1 hover:border-indigo-500/50 relative overflow-hidden flex flex-col">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-indigo-500/20 to-transparent rounded-bl-full pointer-events-none"></div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-slate-900 border border-slate-700 text-indigo-400 rounded-xl flex items-center justify-center shadow-lg group-hover:bg-slate-800 transition-colors duration-300 z-10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </div>
-                            <span class="text-xs font-semibold text-indigo-200 bg-indigo-900/50 px-2 py-1 rounded border border-indigo-800/50">Phénomènes Ondulatoires</span>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold text-white mb-2 z-10">Interférences (Young)</h3>
-                        <p class="text-slate-400 text-sm mb-6 flex-grow z-10">
-                            Visualisation du motif d'interférence créé par deux sources synchrones.
-                        </p>
-                        
-                        <div class="text-xs text-slate-500 group-hover:text-indigo-400 transition-colors mt-auto z-10 flex items-center font-medium">
-                            Construire l'expérience →
-                        </div>
-                    </div>
-                </a>
-
+                    <input type="text" id="search-input" placeholder="Recherche_Simulation..." 
+                           class="w-full bg-lab-card border border-lab-border text-white text-sm focus:ring-1 focus:ring-lab-accent focus:border-lab-accent block pl-8 p-2.5 transition-colors placeholder-lab-border">
+                </div>
             </div>
-
-        </main>
-
-        <!-- Pied de page -->
-        <footer class="mt-auto py-8 text-center border-t border-slate-800 bg-slate-900/80 backdrop-blur-sm relative z-10">
-            <p class="text-slate-500 text-sm">
-                Propulsé par la cinématique et les lois de Newton.
+            
+            <p class="text-lab-text max-w-3xl leading-relaxed text-sm">
+                Expérimentez les lois de la physique à travers des simulations interactives. Modifiez les conditions initiales et observez l'évolution des systèmes en temps réel.
             </p>
-        </footer>
-    </div>
+        </div>
+    </header>
 
-    <!-- SCRIPT GÉRANT LE FOND ANIMÉ (Ondes de Particules) -->
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        
+        <div class="mb-8 flex items-center space-x-2 text-white">
+            <i data-lucide="folder-open" class="w-4 h-4 text-lab-accent"></i>
+            <h2 class="text-lg">/Simulations_Disponibles</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="gallery">
+            
+            <!-- Oscillateur Harmonique (Lien Actif) -->
+            <a href="oscillateur.html" class="lab-card bg-lab-card p-6 flex flex-col group search-target">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs text-lab-accent border border-lab-accent/30 px-2 py-1 bg-lab-accent/5">Mécanique</span>
+                    <i data-lucide="activity" class="w-5 h-5 text-lab-border group-hover:text-lab-accent transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-lab-accent transition-colors">Oscillateur Harmonique</h3>
+                <p class="text-sm mb-6 flex-grow text-lab-text">
+                    Étude du système masse-ressort. Perturbez le système pour visualiser les portraits de phase et l'amortissement.
+                </p>
+                <div class="text-xs text-lab-text flex items-center group-hover:text-white transition-colors uppercase">
+                    [ Lancer_l_experience ] <i data-lucide="arrow-right" class="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Lentilles Minces (Lien Actif) -->
+            <a href="lentilles.html" class="lab-card bg-lab-card p-6 flex flex-col group search-target">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs text-lab-accent border border-lab-accent/30 px-2 py-1 bg-lab-accent/5">Optique</span>
+                    <i data-lucide="sun" class="w-5 h-5 text-lab-border group-hover:text-lab-accent transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-lab-accent transition-colors">Lentilles Minces</h3>
+                <p class="text-sm mb-6 flex-grow text-lab-text">
+                    Tracé des rayons lumineux (convergents/divergents). Construction de l'image réelle ou virtuelle d'un objet.
+                </p>
+                <div class="text-xs text-lab-text flex items-center group-hover:text-white transition-colors uppercase">
+                    [ Lancer_l_experience ] <i data-lucide="arrow-right" class="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Régime Transitoire RLC (En construction) -->
+            <div class="lab-card bg-lab-card p-6 flex flex-col group opacity-60 hover:opacity-100 search-target cursor-not-allowed">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs text-yellow-500 border border-yellow-500/30 px-2 py-1 bg-yellow-500/5">Électrocinétique</span>
+                    <i data-lucide="zap" class="w-5 h-5 text-lab-border"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Régime Transitoire RLC</h3>
+                <p class="text-sm mb-6 flex-grow text-lab-text">
+                    Charge et décharge d'un condensateur. Observez les régimes apériodique, critique et pseudo-périodique.
+                </p>
+                <div class="text-xs text-yellow-500 flex items-center uppercase">
+                    [ En_Developpement ] <i data-lucide="hammer" class="w-3 h-3 ml-2"></i>
+                </div>
+            </div>
+
+            <!-- Interférences (Young) (En construction) -->
+            <div class="lab-card bg-lab-card p-6 flex flex-col group opacity-60 hover:opacity-100 search-target cursor-not-allowed">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs text-yellow-500 border border-yellow-500/30 px-2 py-1 bg-yellow-500/5">Ondulatoire</span>
+                    <i data-lucide="waves" class="w-5 h-5 text-lab-border"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Interférences (Young)</h3>
+                <p class="text-sm mb-6 flex-grow text-lab-text">
+                    Visualisation du motif d'interférence créé par deux sources synchrones.
+                </p>
+                <div class="text-xs text-yellow-500 flex items-center uppercase">
+                    [ En_Developpement ] <i data-lucide="hammer" class="w-3 h-3 ml-2"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Message si aucun résultat -->
+        <div id="no-results" class="hidden text-center py-16 border border-dashed border-lab-border mt-6">
+            <div class="text-lab-text mb-2">ERROR 404</div>
+            <p class="text-sm">Aucune_simulation_trouvee.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer Terminal -->
+    <footer class="border-t border-lab-border bg-lab-bg py-6 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-xs">
+            <div class="flex items-center space-x-2 text-lab-text">
+                <i data-lucide="terminal" class="w-4 h-4"></i>
+                <span>Propulsé par la cinématique et les lois de Newton.</span>
+            </div>
+            <span class="text-lab-border">SYS.V1</span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script>
-        const canvas = document.getElementById('wave-bg');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height;
-        let particles = [];
-        let time = 0;
-        
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            initParticles();
-        }
+        lucide.createIcons();
 
-        // Système de particules en forme de champ d'ondes (Wave Field)
-        class Particle {
-            constructor(x, y, indexX, indexY) {
-                this.baseX = x;
-                this.baseY = y;
-                this.x = x;
-                this.y = y;
-                this.indexX = indexX;
-                this.indexY = indexY;
-                this.size = Math.random() * 1.5 + 0.5;
-            }
+        // Système de recherche "Terminal"
+        const searchInput = document.getElementById('search-input');
+        const cards = document.querySelectorAll('.lab-card');
+        const noResults = document.getElementById('no-results');
 
-            update(t) {
-                // Mouvement ondulatoire basé sur sin et cos créant un motif d'interférence
-                let wave1 = Math.sin(this.indexX * 0.1 + t);
-                let wave2 = Math.cos(this.indexY * 0.1 + t * 0.8);
-                
-                this.y = this.baseY + (wave1 * wave2) * 40;
-                this.x = this.baseX + Math.sin(t * 0.5 + this.indexY * 0.2) * 15;
-            }
+        searchInput.addEventListener('input', (e) => {
+            const currentSearch = e.target.value.toLowerCase();
+            let visibleCount = 0;
 
-            draw() {
-                // Dégradé de couleur en fonction de la profondeur (Y)
-                let intensity = (this.y - this.baseY + 40) / 80; // 0 à 1
-                let opacity = Math.max(0.1, 1 - (this.baseY / height)); // Plus transparent en bas
-                
-                // Couleur entre cyan profond et bleu nuit
-                ctx.fillStyle = `rgba(${Math.floor(6 + intensity * 50)}, ${Math.floor(182 + intensity * 20)}, 212, ${opacity * 0.6})`;
-                
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
+            cards.forEach(card => {
+                // On cherche dans tout le texte de la carte
+                const text = card.textContent.toLowerCase();
 
-        function initParticles() {
-            particles = [];
-            let spacing = 30; // Espace entre les points
-            let cols = Math.floor(width / spacing) + 2;
-            let rows = Math.floor(height / spacing) + 2;
-
-            for (let i = 0; i < cols; i++) {
-                for (let j = 0; j < rows; j++) {
-                    // On ne met des particules que sur les 2/3 supérieurs pour ne pas surcharger le texte en bas
-                    if (j * spacing < height * 0.8) {
-                        particles.push(new Particle(i * spacing - 20, j * spacing - 20, i, j));
-                    }
+                if (text.includes(currentSearch)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
                 }
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            time += 0.02;
-
-            // Optionnel : lier les points proches par des lignes très fines pour faire un "maillage"
-            ctx.lineWidth = 0.5;
-            ctx.strokeStyle = 'rgba(6, 182, 212, 0.05)';
-            
-            particles.forEach(p => {
-                p.update(time);
-                p.draw();
             });
 
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', resize);
-
-        // Démarrage
-        resize();
-        animate();
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
